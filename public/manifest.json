@@ -1,0 +1,99 @@
+
+{
+  "name": "OM MURUGAN AUTO WORKS - Billing System",
+  "short_name": "Auto Bill Guru",
+  "description": "Complete billing solution for automotive services with GST support",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity", "finance"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Auto Bill Guru Dashboard - Desktop View"
+    },
+    {
+      "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Auto Bill Guru Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Invoice",
+      "short_name": "New Invoice",
+      "description": "Create a new invoice quickly",
+      "url": "/invoices",
+      "icons": [
+        {
+          "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Reports",
+      "short_name": "Reports", 
+      "description": "View business reports and analytics",
+      "url": "/reports",
+      "icons": [
+        {
+          "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Manage Customers",
+      "short_name": "Customers",
+      "description": "Manage customer information",
+      "url": "/customers",
+      "icons": [
+        {
+          "src": "/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
