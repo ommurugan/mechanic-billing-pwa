@@ -17,81 +17,81 @@ export type Database = {
       customers: {
         Row: {
           address: string | null
-          created_at: string
+          created_at: string | null
           email: string | null
           gst_number: string | null
           id: string
           name: string
           phone: string
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
           address?: string | null
-          created_at?: string
+          created_at?: string | null
           email?: string | null
           gst_number?: string | null
           id?: string
           name: string
           phone: string
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
           address?: string | null
-          created_at?: string
+          created_at?: string | null
           email?: string | null
           gst_number?: string | null
           id?: string
           name?: string
           phone?: string
-          updated_at?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
       invoice_items: {
         Row: {
           cgst_amount: number | null
-          created_at: string
+          created_at: string | null
           discount_amount: number | null
-          gst_rate: number | null
+          gst_rate: number
           id: string
           invoice_id: string
           item_id: string
           item_type: string
           name: string
           quantity: number
-          sac_hsn_code: string | null
+          sac_hsn_code: string
           sgst_amount: number | null
           total_amount: number
           unit_price: number
         }
         Insert: {
           cgst_amount?: number | null
-          created_at?: string
+          created_at?: string | null
           discount_amount?: number | null
-          gst_rate?: number | null
+          gst_rate: number
           id?: string
           invoice_id: string
           item_id: string
           item_type: string
           name: string
           quantity?: number
-          sac_hsn_code?: string | null
+          sac_hsn_code: string
           sgst_amount?: number | null
-          total_amount?: number
-          unit_price?: number
+          total_amount: number
+          unit_price: number
         }
         Update: {
           cgst_amount?: number | null
-          created_at?: string
+          created_at?: string | null
           discount_amount?: number | null
-          gst_rate?: number | null
+          gst_rate?: number
           id?: string
           invoice_id?: string
           item_id?: string
           item_type?: string
           name?: string
           quantity?: number
-          sac_hsn_code?: string | null
+          sac_hsn_code?: string
           sgst_amount?: number | null
           total_amount?: number
           unit_price?: number
@@ -109,7 +109,7 @@ export type Database = {
       invoices: {
         Row: {
           cgst_amount: number | null
-          created_at: string
+          created_at: string | null
           customer_id: string
           discount_amount: number | null
           discount_percentage: number | null
@@ -123,7 +123,7 @@ export type Database = {
           notes: string | null
           paid_at: string | null
           sgst_amount: number | null
-          status: string
+          status: Database["public"]["Enums"]["invoice_status"] | null
           subtotal: number
           total: number
           total_gst_amount: number | null
@@ -131,7 +131,7 @@ export type Database = {
         }
         Insert: {
           cgst_amount?: number | null
-          created_at?: string
+          created_at?: string | null
           customer_id: string
           discount_amount?: number | null
           discount_percentage?: number | null
@@ -145,7 +145,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           sgst_amount?: number | null
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"] | null
           subtotal?: number
           total?: number
           total_gst_amount?: number | null
@@ -153,7 +153,7 @@ export type Database = {
         }
         Update: {
           cgst_amount?: number | null
-          created_at?: string
+          created_at?: string | null
           customer_id?: string
           discount_amount?: number | null
           discount_percentage?: number | null
@@ -167,7 +167,7 @@ export type Database = {
           notes?: string | null
           paid_at?: string | null
           sgst_amount?: number | null
-          status?: string
+          status?: Database["public"]["Enums"]["invoice_status"] | null
           subtotal?: number
           total?: number
           total_gst_amount?: number | null
@@ -193,69 +193,84 @@ export type Database = {
       parts: {
         Row: {
           category: string | null
-          created_at: string
+          created_at: string | null
           gst_rate: number
-          hsn_code: string | null
+          hsn_code: string
           id: string
-          is_active: boolean
+          is_active: boolean | null
           min_stock_level: number | null
           name: string
+          part_number: string | null
           price: number
           stock_quantity: number | null
-          updated_at: string
+          supplier: string | null
         }
         Insert: {
           category?: string | null
-          created_at?: string
-          gst_rate?: number
-          hsn_code?: string | null
+          created_at?: string | null
+          gst_rate: number
+          hsn_code: string
           id?: string
-          is_active?: boolean
+          is_active?: boolean | null
           min_stock_level?: number | null
           name: string
+          part_number?: string | null
           price?: number
           stock_quantity?: number | null
-          updated_at?: string
+          supplier?: string | null
         }
         Update: {
           category?: string | null
-          created_at?: string
+          created_at?: string | null
           gst_rate?: number
-          hsn_code?: string | null
+          hsn_code?: string
           id?: string
-          is_active?: boolean
+          is_active?: boolean | null
           min_stock_level?: number | null
           name?: string
+          part_number?: string | null
           price?: number
           stock_quantity?: number | null
-          updated_at?: string
+          supplier?: string | null
         }
         Relationships: []
       }
       payments: {
         Row: {
           amount: number
-          created_at: string
+          created_at: string | null
           id: string
           invoice_id: string
-          method: string
-          status: string
+          method: Database["public"]["Enums"]["payment_method"]
+          paid_at: string | null
+          refund_amount: number | null
+          refund_reason: string | null
+          status: Database["public"]["Enums"]["payment_status"] | null
+          transaction_id: string | null
         }
         Insert: {
           amount: number
-          created_at?: string
+          created_at?: string | null
           id?: string
           invoice_id: string
-          method: string
-          status?: string
+          method: Database["public"]["Enums"]["payment_method"]
+          paid_at?: string | null
+          refund_amount?: number | null
+          refund_reason?: string | null
+          status?: Database["public"]["Enums"]["payment_status"] | null
+          transaction_id?: string | null
         }
         Update: {
           amount?: number
-          created_at?: string
+          created_at?: string | null
           id?: string
           invoice_id?: string
-          method?: string
-          status?: string
+          method?: Database["public"]["Enums"]["payment_method"]
+          paid_at?: string | null
+          refund_amount?: number | null
+          refund_reason?: string | null
+          status?: Database["public"]["Enums"]["payment_status"] | null
+          transaction_id?: string | null
         }
         Relationships: [
           {
@@ -271,38 +286,38 @@ export type Database = {
         Row: {
           base_price: number
           category: string | null
-          created_at: string
+          created_at: string | null
+          description: string | null
           estimated_time: number | null
           gst_rate: number
           id: string
-          is_active: boolean
+          is_active: boolean | null
           name: string
-          sac_code: string | null
-          updated_at: string
+          sac_code: string
         }
         Insert: {
           base_price?: number
           category?: string | null
-          created_at?: string
+          created_at?: string | null
+          description?: string | null
           estimated_time?: number | null
-          gst_rate?: number
+          gst_rate: number
           id?: string
-          is_active?: boolean
+          is_active?: boolean | null
           name: string
-          sac_code?: string | null
-          updated_at?: string
+          sac_code: string
         }
         Update: {
           base_price?: number
           category?: string | null
-          created_at?: string
+          created_at?: string | null
+          description?: string | null
           estimated_time?: number | null
           gst_rate?: number
           id?: string
-          is_active?: boolean
+          is_active?: boolean | null
           name?: string
-          sac_code?: string | null
-          updated_at?: string
+          sac_code?: string
         }
         Relationships: []
       }
@@ -310,43 +325,40 @@ export type Database = {
         Row: {
           chassis_number: string | null
           color: string | null
-          created_at: string
+          created_at: string | null
           customer_id: string
           engine_number: string | null
           id: string
           make: string
           model: string
-          updated_at: string
           vehicle_number: string
-          vehicle_type: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
           year: number | null
         }
         Insert: {
           chassis_number?: string | null
           color?: string | null
-          created_at?: string
+          created_at?: string | null
           customer_id: string
           engine_number?: string | null
           id?: string
           make: string
           model: string
-          updated_at?: string
           vehicle_number: string
-          vehicle_type?: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"]
           year?: number | null
         }
         Update: {
           chassis_number?: string | null
           color?: string | null
-          created_at?: string
+          created_at?: string | null
           customer_id?: string
           engine_number?: string | null
           id?: string
           make?: string
           model?: string
-          updated_at?: string
           vehicle_number?: string
-          vehicle_type?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"]
           year?: number | null
         }
         Relationships: [
@@ -367,7 +379,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      invoice_status:
+        | "draft"
+        | "sent"
+        | "paid"
+        | "pending"
+        | "overdue"
+        | "cancelled"
+      payment_method: "cash" | "card" | "upi" | "netbanking" | "bank_transfer"
+      payment_status: "completed" | "pending" | "failed" | "refunded"
+      vehicle_type: "car" | "bike" | "scooter" | "truck" | "van"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -494,6 +515,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      invoice_status: [
+        "draft",
+        "sent",
+        "paid",
+        "pending",
+        "overdue",
+        "cancelled",
+      ],
+      payment_method: ["cash", "card", "upi", "netbanking", "bank_transfer"],
+      payment_status: ["completed", "pending", "failed", "refunded"],
+      vehicle_type: ["car", "bike", "scooter", "truck", "van"],
+    },
   },
 } as const
