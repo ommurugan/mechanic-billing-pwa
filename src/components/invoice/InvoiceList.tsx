@@ -1,6 +1,5 @@
-
 import MobileInvoiceCard from "../MobileInvoiceCard";
-import { DatabaseInvoice } from "@/hooks/useInvoiceData";
+import { DatabaseInvoice } from "@/types/invoice";
 
 interface InvoiceListProps {
   invoices: DatabaseInvoice[];
