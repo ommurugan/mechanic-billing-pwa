@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ import MobileInvoiceCard from "./MobileInvoiceCard";
 
 const ITEMS_PER_PAGE = 10;
 
+type InvoiceStatus = "pending" | "draft" | "sent" | "paid" | "overdue" | "cancelled";
+
 interface DatabaseInvoice {
   id: string;
   invoice_number: string;
@@ -39,7 +42,7 @@ interface DatabaseInvoice {
   labor_charges: number;
   extra_charges: any;
   total: number;
-  status: string;
+  status: InvoiceStatus;
   created_at: string;
   due_date: string;
   paid_at?: string;
@@ -90,7 +93,7 @@ const InvoiceManagement = () => {
       }
 
       if (selectedStatus && selectedStatus !== 'all') {
-        query = query.eq('status', selectedStatus);
+        query = query.eq('status', selectedStatus as InvoiceStatus);
       }
 
       const { count, data: invoicesData, error } = await query;
