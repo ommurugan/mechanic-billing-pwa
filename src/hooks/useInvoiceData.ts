@@ -4,7 +4,7 @@ import { useInvoiceFetch } from "./useInvoiceFetch";
 import { useInvoiceFiltering } from "./useInvoiceFiltering";
 import { useInvoiceCrud } from "./useInvoiceCrud";
 
-export { DatabaseInvoice };
+export type { DatabaseInvoice };
 
 export const useInvoiceData = () => {
   const {
