@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -63,7 +62,7 @@ export const useInvoiceData = () => {
       if (selectedStatus && selectedStatus !== 'all') {
         const validStatuses: InvoiceStatus[] = ["pending", "draft", "sent", "paid", "overdue", "cancelled"];
         if (validStatuses.includes(selectedStatus as InvoiceStatus)) {
-          query = query.eq('status', selectedStatus);
+          query = query.eq('status', selectedStatus as InvoiceStatus);
         }
       }
 
