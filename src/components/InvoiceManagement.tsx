@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,8 +91,12 @@ const InvoiceManagement = () => {
         query = query.lte('created_at', dateRange.to.toISOString());
       }
 
+      // Fix: Only filter by status if it's not "all" and is a valid InvoiceStatus
       if (selectedStatus && selectedStatus !== 'all') {
-        query = query.eq('status', selectedStatus as InvoiceStatus);
+        const validStatuses: InvoiceStatus[] = ["pending", "draft", "sent", "paid", "overdue", "cancelled"];
+        if (validStatuses.includes(selectedStatus as InvoiceStatus)) {
+          query = query.eq('status', selectedStatus);
+        }
       }
 
       const { count, data: invoicesData, error } = await query;
