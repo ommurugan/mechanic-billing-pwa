@@ -32,6 +32,7 @@ const Services = () => {
     description: "",
     price: "",
     duration: "",
+    durationUnit: "hours",
     category: "",
     sacCode: "",
     gstRate: "18"
@@ -42,12 +43,34 @@ const Services = () => {
     description: "",
     price: "",
     stock: "",
+    duration: "",
+    durationUnit: "hours",
     category: "",
     hsnCode: "",
     gstRate: "18",
     supplier: "",
     partNumber: ""
   });
+
+  const timeUnits = [
+    { value: 'minutes', label: 'Minutes' },
+    { value: 'hours', label: 'Hours' },
+    { value: 'days', label: 'Days' },
+    { value: 'months', label: 'Months' }
+  ];
+
+  const convertToMinutes = (duration: number, unit: string) => {
+    switch (unit) {
+      case 'hours':
+        return duration * 60;
+      case 'days':
+        return duration * 60 * 24;
+      case 'months':
+        return duration * 60 * 24 * 30;
+      default:
+        return duration; // minutes
+    }
+  };
 
   const filteredServices = services.filter(service =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,13 +91,16 @@ const Services = () => {
     setSubmitting(true);
     
     try {
+      const durationInMinutes = newService.duration ? 
+        convertToMinutes(parseInt(newService.duration), newService.durationUnit) : 0;
+
       const { error } = await supabase
         .from('services')
         .insert({
           name: newService.name,
           description: newService.description || null,
           base_price: parseFloat(newService.price),
-          estimated_time: newService.duration ? parseInt(newService.duration) : 0,
+          estimated_time: durationInMinutes,
           category: newService.category || null,
           sac_code: newService.sacCode,
           gst_rate: parseInt(newService.gstRate)
@@ -89,6 +115,7 @@ const Services = () => {
         description: "",
         price: "",
         duration: "",
+        durationUnit: "hours",
         category: "",
         sacCode: "",
         gstRate: "18"
@@ -132,6 +159,8 @@ const Services = () => {
         description: "",
         price: "",
         stock: "",
+        duration: "",
+        durationUnit: "hours",
         category: "",
         hsnCode: "",
         gstRate: "18",
@@ -269,24 +298,42 @@ const Services = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="serviceDuration">Duration (minutes)</Label>
+                            <Label htmlFor="serviceDuration">Duration</Label>
                             <Input 
                               id="serviceDuration"
                               type="number"
                               value={newService.duration}
                               onChange={(e) => setNewService({...newService, duration: e.target.value})}
-                              placeholder="120"
+                              placeholder="1"
                             />
                           </div>
                           <div>
-                            <Label htmlFor="serviceCategory">Category</Label>
-                            <Input 
-                              id="serviceCategory"
-                              value={newService.category}
-                              onChange={(e) => setNewService({...newService, category: e.target.value})}
-                              placeholder="e.g., Maintenance"
-                            />
+                            <Label htmlFor="durationUnit">Time Unit</Label>
+                            <Select 
+                              value={newService.durationUnit} 
+                              onValueChange={(value) => setNewService({...newService, durationUnit: value})}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {timeUnits.map((unit) => (
+                                  <SelectItem key={unit.value} value={unit.value}>
+                                    {unit.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="serviceCategory">Category</Label>
+                          <Input 
+                            id="serviceCategory"
+                            value={newService.category}
+                            onChange={(e) => setNewService({...newService, category: e.target.value})}
+                            placeholder="e.g., Maintenance"
+                          />
                         </div>
                         <Button 
                           onClick={handleAddService} 
@@ -423,6 +470,36 @@ const Services = () => {
                               onChange={(e) => setNewPart({...newPart, category: e.target.value})}
                               placeholder="e.g., Filters"
                             />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="partDuration">Install Duration</Label>
+                            <Input 
+                              id="partDuration"
+                              type="number"
+                              value={newPart.duration}
+                              onChange={(e) => setNewPart({...newPart, duration: e.target.value})}
+                              placeholder="1"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="partDurationUnit">Time Unit</Label>
+                            <Select 
+                              value={newPart.durationUnit} 
+                              onValueChange={(value) => setNewPart({...newPart, durationUnit: value})}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {timeUnits.map((unit) => (
+                                  <SelectItem key={unit.value} value={unit.value}>
+                                    {unit.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
