@@ -1,24 +1,17 @@
+
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Plus, 
-  Search, 
-  Wrench,
-  Package
-} from "lucide-react";
 import MobileSidebar from "@/components/MobileSidebar";
 import BottomNavigation from "@/components/BottomNavigation";
 import LogoutButton from "@/components/LogoutButton";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSupabaseData } from "@/hooks/useSupabaseData";
+import SearchBar from "@/components/services/SearchBar";
+import ServicesList from "@/components/services/ServicesList";
+import PartsList from "@/components/services/PartsList";
+import AddServiceModal from "@/components/services/AddServiceModal";
+import AddPartModal from "@/components/services/AddPartModal";
 
 const Services = () => {
   const { services, parts, fetchServices, fetchParts, loading } = useSupabaseData();
@@ -32,7 +25,7 @@ const Services = () => {
     description: "",
     price: "",
     duration: "",
-    durationUnit: "hours",
+    durationUnit: "minutes",
     category: "",
     sacCode: "",
     gstRate: "18"
@@ -44,7 +37,7 @@ const Services = () => {
     price: "",
     stock: "",
     duration: "",
-    durationUnit: "hours",
+    durationUnit: "minutes",
     category: "",
     hsnCode: "",
     gstRate: "18",
@@ -115,7 +108,7 @@ const Services = () => {
         description: "",
         price: "",
         duration: "",
-        durationUnit: "hours",
+        durationUnit: "minutes",
         category: "",
         sacCode: "",
         gstRate: "18"
@@ -160,7 +153,7 @@ const Services = () => {
         price: "",
         stock: "",
         duration: "",
-        durationUnit: "hours",
+        durationUnit: "minutes",
         category: "",
         hsnCode: "",
         gstRate: "18",
@@ -199,387 +192,51 @@ const Services = () => {
           </header>
 
           <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
-          {/* Search */}
-          <Card className="mb-3">
-            <CardContent className="pt-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input 
-                  placeholder="Search services and parts..." 
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+            <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+
+            <Tabs defaultValue="services" className="space-y-3">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="services">Services Catalog</TabsTrigger>
+                <TabsTrigger value="parts">Parts Inventory</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="services">
+                <ServicesList 
+                  services={filteredServices} 
+                  onAddService={() => setShowAddServiceForm(true)} 
                 />
-              </div>
-            </CardContent>
-          </Card>
+              </TabsContent>
 
-          <Tabs defaultValue="services" className="space-y-3">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="services">Services Catalog</TabsTrigger>
-              <TabsTrigger value="parts">Parts Inventory</TabsTrigger>
-            </TabsList>
-
-            {/* Services Tab */}
-            <TabsContent value="services">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-lg font-semibold">Services Catalog</h2>
-                    <p className="text-gray-600 text-sm">Manage your service offerings and pricing</p>
-                  </div>
-                  <Dialog open={showAddServiceForm} onOpenChange={setShowAddServiceForm}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-blue-600 hover:bg-blue-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Service
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Add New Service</DialogTitle>
-                        <DialogDescription>
-                          Create a new service offering for your catalog
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="serviceName">Service Name *</Label>
-                          <Input 
-                            id="serviceName"
-                            value={newService.name}
-                            onChange={(e) => setNewService({...newService, name: e.target.value})}
-                            placeholder="Enter service name"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="sacCode">SAC Code *</Label>
-                          <Input 
-                            id="sacCode"
-                            value={newService.sacCode}
-                            onChange={(e) => setNewService({...newService, sacCode: e.target.value})}
-                            placeholder="Enter SAC code"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="serviceDescription">Description</Label>
-                          <Textarea 
-                            id="serviceDescription"
-                            value={newService.description}
-                            onChange={(e) => setNewService({...newService, description: e.target.value})}
-                            placeholder="Describe the service"
-                            rows={3}
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="servicePrice">Price (₹) *</Label>
-                            <Input 
-                              id="servicePrice"
-                              type="number"
-                              value={newService.price}
-                              onChange={(e) => setNewService({...newService, price: e.target.value})}
-                              placeholder="0"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="gstRate">GST Rate *</Label>
-                            <Select value={newService.gstRate} onValueChange={(value) => setNewService({...newService, gstRate: value})}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="9">9%</SelectItem>
-                                <SelectItem value="18">18%</SelectItem>
-                                <SelectItem value="28">28%</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="serviceDuration">Duration</Label>
-                            <Input 
-                              id="serviceDuration"
-                              type="number"
-                              value={newService.duration}
-                              onChange={(e) => setNewService({...newService, duration: e.target.value})}
-                              placeholder="1"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="durationUnit">Time Unit</Label>
-                            <Select 
-                              value={newService.durationUnit} 
-                              onValueChange={(value) => setNewService({...newService, durationUnit: value})}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {timeUnits.map((unit) => (
-                                  <SelectItem key={unit.value} value={unit.value}>
-                                    {unit.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="serviceCategory">Category</Label>
-                          <Input 
-                            id="serviceCategory"
-                            value={newService.category}
-                            onChange={(e) => setNewService({...newService, category: e.target.value})}
-                            placeholder="e.g., Maintenance"
-                          />
-                        </div>
-                        <Button 
-                          onClick={handleAddService} 
-                          className="w-full bg-blue-600 hover:bg-blue-700"
-                          disabled={submitting}
-                        >
-                          {submitting ? "Adding..." : "Add Service"}
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <Card>
-                  <CardContent className="pt-3">
-                    {filteredServices.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredServices.map((service) => (
-                          <div key={service.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <h3 className="font-medium text-gray-900">{service.name}</h3>
-                            <p className="text-sm text-gray-600 mt-1">SAC: {service.sac_code}</p>
-                            <div className="flex justify-between items-center mt-3">
-                              <span className="text-lg font-semibold text-blue-600">
-                                ₹{Number(service.base_price).toLocaleString('en-IN')}
-                              </span>
-                              <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
-                                {service.gst_rate}% GST
-                              </span>
-                            </div>
-                            {service.category && (
-                              <p className="text-xs text-gray-500 mt-2">{service.category}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        <Wrench className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No services yet</h3>
-                        <p className="mb-4 text-sm">Create your first service to start building your catalog.</p>
-                        <Button onClick={() => setShowAddServiceForm(true)} className="bg-blue-600 hover:bg-blue-700">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Your First Service
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Parts Tab */}
-            <TabsContent value="parts">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-lg font-semibold">Parts Inventory</h2>
-                    <p className="text-gray-600 text-sm">Manage your spare parts stock and pricing</p>
-                  </div>
-                  <Dialog open={showAddPartForm} onOpenChange={setShowAddPartForm}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Part
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Add New Part</DialogTitle>
-                        <DialogDescription>
-                          Add a new spare part to your inventory
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="partName">Part Name *</Label>
-                          <Input 
-                            id="partName"
-                            value={newPart.name}
-                            onChange={(e) => setNewPart({...newPart, name: e.target.value})}
-                            placeholder="Enter part name"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="hsnCode">HSN Code *</Label>
-                          <Input 
-                            id="hsnCode"
-                            value={newPart.hsnCode}
-                            onChange={(e) => setNewPart({...newPart, hsnCode: e.target.value})}
-                            placeholder="Enter HSN code"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="partPrice">Price (₹) *</Label>
-                            <Input 
-                              id="partPrice"
-                              type="number"
-                              value={newPart.price}
-                              onChange={(e) => setNewPart({...newPart, price: e.target.value})}
-                              placeholder="0"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="partGstRate">GST Rate *</Label>
-                            <Select value={newPart.gstRate} onValueChange={(value) => setNewPart({...newPart, gstRate: value})}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="9">9%</SelectItem>
-                                <SelectItem value="18">18%</SelectItem>
-                                <SelectItem value="28">28%</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="partStock">Stock Quantity</Label>
-                            <Input 
-                              id="partStock"
-                              type="number"
-                              value={newPart.stock}
-                              onChange={(e) => setNewPart({...newPart, stock: e.target.value})}
-                              placeholder="0"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="partCategory">Category</Label>
-                            <Input 
-                              id="partCategory"
-                              value={newPart.category}
-                              onChange={(e) => setNewPart({...newPart, category: e.target.value})}
-                              placeholder="e.g., Filters"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="partDuration">Install Duration</Label>
-                            <Input 
-                              id="partDuration"
-                              type="number"
-                              value={newPart.duration}
-                              onChange={(e) => setNewPart({...newPart, duration: e.target.value})}
-                              placeholder="1"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="partDurationUnit">Time Unit</Label>
-                            <Select 
-                              value={newPart.durationUnit} 
-                              onValueChange={(value) => setNewPart({...newPart, durationUnit: value})}
-                            >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {timeUnits.map((unit) => (
-                                  <SelectItem key={unit.value} value={unit.value}>
-                                    {unit.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="supplier">Supplier</Label>
-                            <Input 
-                              id="supplier"
-                              value={newPart.supplier}
-                              onChange={(e) => setNewPart({...newPart, supplier: e.target.value})}
-                              placeholder="Supplier name"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="partNumber">Part Number</Label>
-                            <Input 
-                              id="partNumber"
-                              value={newPart.partNumber}
-                              onChange={(e) => setNewPart({...newPart, partNumber: e.target.value})}
-                              placeholder="Part number"
-                            />
-                          </div>
-                        </div>
-                        <Button 
-                          onClick={handleAddPart} 
-                          className="w-full bg-green-600 hover:bg-green-700"
-                          disabled={submitting}
-                        >
-                          {submitting ? "Adding..." : "Add Part"}
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                <Card>
-                  <CardContent className="pt-3">
-                    {filteredParts.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredParts.map((part) => (
-                          <div key={part.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <h3 className="font-medium text-gray-900">{part.name}</h3>
-                            <p className="text-sm text-gray-600 mt-1">HSN: {part.hsn_code}</p>
-                            <div className="flex justify-between items-center mt-3">
-                              <span className="text-lg font-semibold text-green-600">
-                                ₹{Number(part.price).toLocaleString('en-IN')}
-                              </span>
-                              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                {part.gst_rate}% GST
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center mt-2">
-                              <span className="text-sm text-gray-600">
-                                Stock: {part.stock_quantity || 0}
-                              </span>
-                              {part.category && (
-                                <span className="text-xs text-gray-500">{part.category}</span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-500">
-                        <Package className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No parts yet</h3>
-                        <p className="mb-4 text-sm">Add your first spare part to start building your inventory.</p>
-                        <Button onClick={() => setShowAddPartForm(true)} className="bg-green-600 hover:bg-green-700">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Your First Part
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+              <TabsContent value="parts">
+                <PartsList 
+                  parts={filteredParts} 
+                  onAddPart={() => setShowAddPartForm(true)} 
+                />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
+      
+      <AddServiceModal
+        isOpen={showAddServiceForm}
+        onClose={() => setShowAddServiceForm(false)}
+        newService={newService}
+        setNewService={setNewService}
+        onSubmit={handleAddService}
+        submitting={submitting}
+        timeUnits={timeUnits}
+      />
+
+      <AddPartModal
+        isOpen={showAddPartForm}
+        onClose={() => setShowAddPartForm(false)}
+        newPart={newPart}
+        setNewPart={setNewPart}
+        onSubmit={handleAddPart}
+        submitting={submitting}
+        timeUnits={timeUnits}
+      />
       
       <BottomNavigation />
     </div>
