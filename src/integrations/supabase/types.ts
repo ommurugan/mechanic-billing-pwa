@@ -376,7 +376,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_sequential_invoice_number: {
+        Args: { invoice_type_prefix: string }
+        Returns: string
+      }
     }
     Enums: {
       invoice_status:

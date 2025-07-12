@@ -192,13 +192,19 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
     return subtotal - discountAmount + totalGST;
   };
 
-  const generateInvoiceNumber = () => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `GST-${year}${month}${day}-${random}`;
+  const generateInvoiceNumber = async () => {
+    try {
+      const { data, error } = await supabase.rpc('generate_sequential_invoice_number', {
+        invoice_type_prefix: 'GST'
+      });
+      
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error generating invoice number:', error);
+      // Fallback to timestamp-based number if function fails
+      return `GST-${Date.now()}`;
+    }
   };
 
   const handleSaveInvoice = async () => {
@@ -218,8 +224,10 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
       const discountAmount = (subtotal * discount) / 100;
       const { totalGST, cgst, sgst } = calculateGST();
 
+      const invoiceNumber = await generateInvoiceNumber();
+      
       const invoiceData = {
-        invoice_number: generateInvoiceNumber(),
+        invoice_number: invoiceNumber,
         invoice_type: 'gst',
         customer_id: selectedCustomer.id,
         vehicle_id: selectedVehicle.id,
