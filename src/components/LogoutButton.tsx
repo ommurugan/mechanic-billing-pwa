@@ -3,14 +3,26 @@ import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const LogoutButton = () => {
+  const navigate = useNavigate();
+  
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      // Clear the session in the database
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      if (error) {
+        console.error("Logout error:", error);
+        toast.error("Error signing out");
+      } else {
+        toast.success("Signed out successfully");
+        // Navigate to auth page after successful logout
+        navigate('/auth');
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
       toast.error("Error signing out");
-    } else {
-      toast.success("Signed out successfully");
     }
   };
 
