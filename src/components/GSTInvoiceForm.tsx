@@ -87,6 +87,63 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
     }
   }, [selectedCustomer]);
 
+  // Load existing invoice data when editing
+  useEffect(() => {
+    if (existingInvoice) {
+      const loadInvoiceData = async () => {
+        try {
+          // Set basic invoice data
+          setKilometers(existingInvoice.kilometers || 0);
+          setLaborCharges(existingInvoice.labor_charges || 0);
+          setDiscount(existingInvoice.discount_percentage || 0);
+          setExtraCharges(existingInvoice.extra_charges || []);
+          setNotes(existingInvoice.notes || "");
+
+          // Find and set customer
+          const customer = customers.find(c => c.id === existingInvoice.customer_id);
+          if (customer) {
+            setSelectedCustomer(customer);
+          }
+
+          // Find and set vehicle
+          const vehicle = vehicles.find(v => v.id === existingInvoice.vehicle_id);
+          if (vehicle) {
+            setSelectedVehicle(vehicle);
+          }
+
+          // Load invoice items
+          const { data: items } = await supabase
+            .from('invoice_items')
+            .select('*')
+            .eq('invoice_id', existingInvoice.id);
+
+          if (items) {
+            const formattedItems = items.map((item, index) => ({
+              id: `${item.id}-${index}`,
+              item_type: item.item_type,
+              item_id: item.item_id,
+              name: item.name,
+              sac_hsn_code: item.sac_hsn_code,
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              discount_amount: item.discount_amount || 0,
+              gst_rate: item.gst_rate,
+              total_amount: item.total_amount
+            }));
+            setInvoiceItems(formattedItems);
+          }
+        } catch (error) {
+          console.error('Error loading invoice data:', error);
+          toast.error("Failed to load invoice data");
+        }
+      };
+
+      if (customers.length > 0 && vehicles.length > 0) {
+        loadInvoiceData();
+      }
+    }
+  }, [existingInvoice, customers, vehicles]);
+
   const customerVehicles = vehicles;
 
   const addService = (serviceId: string) => {
@@ -224,10 +281,7 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
       const discountAmount = (subtotal * discount) / 100;
       const { totalGST, cgst, sgst } = calculateGST();
 
-      const invoiceNumber = await generateInvoiceNumber();
-      
       const invoiceData = {
-        invoice_number: invoiceNumber,
         invoice_type: 'gst',
         customer_id: selectedCustomer.id,
         vehicle_id: selectedVehicle.id,
@@ -246,13 +300,39 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
         kilometers
       };
 
-      const { data: invoice, error: invoiceError } = await supabase
-        .from('invoices')
-        .insert(invoiceData)
-        .select()
-        .single();
+      let invoice;
 
-      if (invoiceError) throw invoiceError;
+      if (existingInvoice) {
+        // Update existing invoice
+        const { data, error: invoiceError } = await supabase
+          .from('invoices')
+          .update(invoiceData)
+          .eq('id', existingInvoice.id)
+          .select()
+          .single();
+
+        if (invoiceError) throw invoiceError;
+        invoice = data;
+
+        // Delete existing items and insert new ones
+        await supabase
+          .from('invoice_items')
+          .delete()
+          .eq('invoice_id', existingInvoice.id);
+      } else {
+        // Create new invoice
+        const invoiceNumber = await generateInvoiceNumber();
+        const newInvoiceData = { ...invoiceData, invoice_number: invoiceNumber };
+        
+        const { data, error: invoiceError } = await supabase
+          .from('invoices')
+          .insert(newInvoiceData)
+          .select()
+          .single();
+
+        if (invoiceError) throw invoiceError;
+        invoice = data;
+      }
 
       // Insert invoice items
       const itemsData = invoiceItems.map(item => {
@@ -297,7 +377,7 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
         if (paymentError) throw paymentError;
       }
 
-      toast.success("GST Invoice saved successfully!");
+      toast.success(existingInvoice ? "Invoice updated successfully!" : "GST Invoice saved successfully!");
       onSave(invoice);
     } catch (error) {
       console.error('Error saving invoice:', error);
@@ -346,15 +426,18 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
             <div>
               <Label>Select GST Customer</Label>
               <div className="flex gap-2">
-                <Select onValueChange={(value) => {
-                  if (value === "add-new") {
-                    setShowAddCustomer(true);
-                    return;
-                  }
-                  const customer = customers.find(c => c.id === value);
-                  setSelectedCustomer(customer || null);
-                  setSelectedVehicle(null);
-                }}>
+                <Select 
+                  value={selectedCustomer?.id || ""} 
+                  onValueChange={(value) => {
+                    if (value === "add-new") {
+                      setShowAddCustomer(true);
+                      return;
+                    }
+                    const customer = customers.find(c => c.id === value);
+                    setSelectedCustomer(customer || null);
+                    setSelectedVehicle(null);
+                  }}
+                >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Choose a GST customer" />
                   </SelectTrigger>
@@ -401,6 +484,7 @@ const GSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: GSTInvoiceFormPro
             <div>
               <Label>Select Vehicle</Label>
               <Select 
+                value={selectedVehicle?.id || ""}
                 onValueChange={(value) => {
                   const vehicle = customerVehicles.find(v => v.id === value);
                   setSelectedVehicle(vehicle || null);
