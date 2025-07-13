@@ -162,6 +162,10 @@ const GSTInvoiceManagement = () => {
   };
 
   const handleEditInvoice = (invoice: any) => {
+    if (invoice.status === 'paid') {
+      toast.error("This invoice has been paid and cannot be edited");
+      return;
+    }
     setSelectedInvoice(invoice);
     setShowCreateForm(true);
   };
@@ -454,7 +458,7 @@ const GSTInvoiceManagement = () => {
                 invoice={invoice}
                 customerName={getCustomerName(invoice.customer_id)}
                 vehicleInfo={getVehicleInfo(invoice.vehicle_id)}
-                onEdit={handleViewInvoice}
+                onEdit={handleEditInvoice}
                 onDelete={handleDeleteInvoice}
                 onPrint={handlePrintInvoice}
                 onMarkPaid={() => handleMarkAsPaid(invoice.id)}
