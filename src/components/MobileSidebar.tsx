@@ -90,7 +90,7 @@ const MobileSidebar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-64 bg-white border-r border-gray-200">
+      <div className="hidden md:block w-64 bg-white border-r border-gray-200 fixed left-0 top-0 h-full z-10">
         <SidebarContent />
       </div>
 

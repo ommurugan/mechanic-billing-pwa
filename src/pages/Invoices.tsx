@@ -12,7 +12,7 @@ const Invoices = () => {
       <div className="flex w-full flex-1 overflow-hidden">
         <MobileSidebar />
         
-        <div className="flex-1 flex flex-col min-h-screen w-full overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-screen w-full overflow-hidden md:ml-64">
           <header className="bg-white shadow-sm border-b px-4 md:px-6 py-4 pt-16 md:pt-4 flex-shrink-0">
             <div className="flex justify-between items-center">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">Invoices</h1>
