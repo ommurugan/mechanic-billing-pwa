@@ -88,7 +88,7 @@ const NonGSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: NonGSTInvoiceF
 
   // Load existing invoice data when editing
   useEffect(() => {
-    if (existingInvoice) {
+    if (existingInvoice && customers.length > 0) {
       const loadInvoiceData = async () => {
         try {
           // Set basic invoice data
@@ -98,16 +98,31 @@ const NonGSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: NonGSTInvoiceF
           setExtraCharges(existingInvoice.extra_charges || []);
           setNotes(existingInvoice.notes || "");
 
-          // Find and set customer
-          const customer = customers.find(c => c.id === existingInvoice.customer_id);
-          if (customer) {
-            setSelectedCustomer(customer);
-          }
-
-          // Find and set vehicle
-          const vehicle = vehicles.find(v => v.id === existingInvoice.vehicle_id);
-          if (vehicle) {
-            setSelectedVehicle(vehicle);
+          // Fetch and set customer
+          const { data: customerData } = await supabase
+            .from('customers')
+            .select('*')
+            .eq('id', existingInvoice.customer_id)
+            .single();
+          
+          if (customerData) {
+            setSelectedCustomer(customerData);
+            
+            // Fetch vehicles for this customer
+            const { data: vehicleData } = await supabase
+              .from('vehicles')
+              .select('*')
+              .eq('customer_id', existingInvoice.customer_id);
+              
+            if (vehicleData) {
+              setVehicles(vehicleData);
+              
+              // Find and set vehicle
+              const vehicle = vehicleData.find(v => v.id === existingInvoice.vehicle_id);
+              if (vehicle) {
+                setSelectedVehicle(vehicle);
+              }
+            }
           }
 
           // Load invoice items
@@ -137,11 +152,9 @@ const NonGSTInvoiceForm = ({ onSave, onCancel, existingInvoice }: NonGSTInvoiceF
         }
       };
 
-      if (customers.length > 0 && vehicles.length > 0) {
-        loadInvoiceData();
-      }
+      loadInvoiceData();
     }
-  }, [existingInvoice, customers, vehicles]);
+  }, [existingInvoice, customers]);
 
   const customerVehicles = vehicles;
 

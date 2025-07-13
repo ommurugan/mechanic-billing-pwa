@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   Plus, 
   Search, 
@@ -36,6 +43,7 @@ const GSTInvoiceManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewInvoice, setViewInvoice] = useState<any>(null);
+  const [showPaidNotification, setShowPaidNotification] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -163,7 +171,7 @@ const GSTInvoiceManagement = () => {
 
   const handleEditInvoice = (invoice: any) => {
     if (invoice.status === 'paid') {
-      toast.error("This invoice has been paid and cannot be edited");
+      setShowPaidNotification(true);
       return;
     }
     setSelectedInvoice(invoice);
@@ -482,6 +490,26 @@ const GSTInvoiceManagement = () => {
           onPrint={() => window.print()}
         />
       )}
+
+      {/* Paid Invoice Notification Dialog */}
+      <Dialog open={showPaidNotification} onOpenChange={setShowPaidNotification}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              Cannot Edit Invoice
+            </DialogTitle>
+            <DialogDescription>
+              This invoice has been marked as paid and cannot be edited. Paid invoices are locked to maintain billing integrity.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowPaidNotification(false)}>
+              Understood
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

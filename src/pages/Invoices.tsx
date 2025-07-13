@@ -8,12 +8,12 @@ import NonGSTInvoiceManagement from "@/components/NonGSTInvoiceManagement";
 
 const Invoices = () => {
   return (
-    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
-      <div className="flex w-full">
+    <div className="min-h-screen bg-gray-50 w-full overflow-hidden flex flex-col">
+      <div className="flex w-full flex-1 overflow-hidden">
         <MobileSidebar />
         
-        <div className="flex-1 flex flex-col min-h-screen w-full overflow-x-hidden">
-          <header className="bg-white shadow-sm border-b px-4 md:px-6 py-4 pt-16 md:pt-4">
+        <div className="flex-1 flex flex-col min-h-screen w-full overflow-hidden">
+          <header className="bg-white shadow-sm border-b px-4 md:px-6 py-4 pt-16 md:pt-4 flex-shrink-0">
             <div className="flex justify-between items-center">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">Invoices</h1>
               <div className="hidden md:block">
@@ -22,7 +22,7 @@ const Invoices = () => {
             </div>
           </header>
 
-          <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6 w-full overflow-x-hidden">
+          <div className="flex-1 p-4 md:p-6 pb-20 md:pb-6 w-full overflow-y-auto">
             <Tabs defaultValue="non-gst" className="space-y-4 w-full">
               <div className="w-full overflow-x-auto">
                 <TabsList className="grid w-full grid-cols-2">
