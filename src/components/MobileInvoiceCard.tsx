@@ -22,6 +22,7 @@ interface MobileInvoiceCardProps {
   onDelete: (invoiceId: string) => void;
   onPrint: (invoice: any) => void;
   onMarkPaid?: (invoiceId: string) => void;
+  onUndoPaid?: (invoiceId: string) => void;
 }
 
 const MobileInvoiceCard = ({ 
@@ -31,7 +32,8 @@ const MobileInvoiceCard = ({
   onEdit, 
   onDelete, 
   onPrint,
-  onMarkPaid
+  onMarkPaid,
+  onUndoPaid
 }: MobileInvoiceCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -103,8 +105,21 @@ const MobileInvoiceCard = ({
               variant="ghost" 
               onClick={() => onMarkPaid(invoice.id)}
               className="text-green-600 hover:text-green-700"
+              title="Mark as Paid"
             >
               <Check className="h-4 w-4" />
+            </Button>
+          )}
+          
+          {invoice.status === 'paid' && onUndoPaid && (
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              onClick={() => onUndoPaid(invoice.id)}
+              className="text-orange-600 hover:text-orange-700"
+              title="Undo Paid Status"
+            >
+              <Clock className="h-4 w-4" />
             </Button>
           )}
           

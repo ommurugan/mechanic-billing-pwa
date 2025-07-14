@@ -65,39 +65,24 @@ const AddPartModal = ({
               />
             </div>
             <div>
-              <Label htmlFor="partGstRate">GST Rate *</Label>
-              <Select value={newPart.gstRate} onValueChange={(value) => setNewPart({...newPart, gstRate: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="9">9%</SelectItem>
-                  <SelectItem value="18">18%</SelectItem>
-                  <SelectItem value="28">28%</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="partGstRate">GST Rate (%) *</Label>
+              <Input 
+                id="partGstRate"
+                type="number"
+                value={newPart.gstRate}
+                onChange={(e) => setNewPart({...newPart, gstRate: e.target.value})}
+                placeholder="Enter GST rate (e.g. 18)"
+              />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="partStock">Stock Quantity</Label>
-              <Input 
-                id="partStock"
-                type="number"
-                value={newPart.stock}
-                onChange={(e) => setNewPart({...newPart, stock: e.target.value})}
-                placeholder="0"
-              />
-            </div>
-            <div>
-              <Label htmlFor="partCategory">Category</Label>
-              <Input 
-                id="partCategory"
-                value={newPart.category}
-                onChange={(e) => setNewPart({...newPart, category: e.target.value})}
-                placeholder="e.g., Filters"
-              />
-            </div>
+          <div>
+            <Label htmlFor="partCategory">Category</Label>
+            <Input 
+              id="partCategory"
+              value={newPart.category}
+              onChange={(e) => setNewPart({...newPart, category: e.target.value})}
+              placeholder="e.g., Filters"
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

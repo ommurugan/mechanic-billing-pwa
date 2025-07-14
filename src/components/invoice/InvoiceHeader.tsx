@@ -9,7 +9,7 @@ const InvoiceHeader = ({ onPrint }: InvoiceHeaderProps) => {
   return (
     <div className="text-center border-b-2 border-black pb-4 mb-6">
       <div className="flex items-center justify-center mb-2">
-        <img src="/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png" alt="OM MURUGAN AUTO WORKS" className="h-12 w-12 mr-3" />
+        <img src="/lovable-uploads/867f2348-4515-4cb0-8064-a7222ce3b23f.png" alt="OM MURUGAN AUTO WORKS" className="h-20 w-20 mr-3" />
         <div>
           <h1 className="text-2xl font-bold">OM MURUGAN AUTO WORKS</h1>
           <p className="text-sm">Complete Auto Care Solutions</p>
