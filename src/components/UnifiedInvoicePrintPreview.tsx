@@ -81,49 +81,62 @@ const UnifiedInvoicePrintPreview = ({
       </div>
 
       {/* Invoice content - this will be printed */}
-      <div className="print-content max-w-4xl mx-auto p-8 print:p-4 print:max-w-none print:mx-0">
-        {/* Header */}
-        <InvoiceHeader onPrint={handlePrint} />
+      <div className="print-content max-w-4xl mx-auto p-6 print:p-4 print:max-w-none print:mx-0 bg-white">
+        {/* Company Header */}
+        <div className="text-center mb-6 border-b border-gray-300 pb-4">
+          <h1 className="text-2xl font-bold text-black">OM MURUGAN AUTO WORKS</h1>
+          <p className="text-sm text-gray-600 mb-2">Complete Auto Care Solutions</p>
+          <p className="text-xs text-gray-600 mb-1">
+            Door No.8, 4th Main Road, Manikandapuram, Thirumullaivoyal,
+          </p>
+          <p className="text-xs text-gray-600 mb-1">Chennai-600 062</p>
+          <div className="flex justify-center items-center gap-4 text-xs">
+            <span><strong>GSTIN/UIN:</strong> 33AXNPGZ468F1ZR</span>
+            <span><strong>State Name:</strong> Tamil Nadu, <strong>Code:</strong> 33</span>
+          </div>
+          <div className="flex justify-center items-center gap-4 text-xs mt-1">
+            <span><strong>E-Mail:</strong> gopalakrishn.p8@gmail.com</span>
+            <span><strong>Phone:</strong> + 91 9884551560</span>
+          </div>
+        </div>
 
-        {/* Invoice Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* Bill To and Invoice Details */}
+        <div className="grid grid-cols-2 gap-8 mb-6">
           <div>
-            <h3 className="text-lg font-bold mb-3">BILL TO:</h3>
-            <div className="space-y-1">
+            <h3 className="text-sm font-bold mb-2">BILL TO:</h3>
+            <div className="text-sm space-y-1">
               <p className="font-semibold">{customer?.name || 'N/A'}</p>
               <p>{customer?.phone || 'N/A'}</p>
-              {customer?.email && <p>{customer.email}</p>}
+              {customer?.email && <p>- {customer.email}</p>}
               {customer?.address && <p>{customer.address}</p>}
               {customer?.gst_number && (
                 <p><strong>GST No:</strong> {customer.gst_number}</p>
               )}
             </div>
           </div>
-          <div className="text-left md:text-right">
-            <div className="space-y-2">
+          <div className="text-right">
+            <div className="text-sm space-y-1">
               <p><strong>Invoice No:</strong> {invoice.invoice_number}</p>
               <p><strong>Date:</strong> {formatDate(invoice.created_at)}</p>
               {invoice.due_date && (
                 <p><strong>Due Date:</strong> {formatDate(invoice.due_date)}</p>
               )}
               <p><strong>Invoice Type:</strong> {invoice.invoice_type === 'gst' ? 'GST Invoice' : 'Non-GST Invoice'}</p>
-              <p><strong>Status:</strong> <span className="capitalize">{invoice.status}</span></p>
             </div>
           </div>
         </div>
 
-        {/* Vehicle Information */}
+        {/* Vehicle Details */}
         {vehicle && (
-          <div className="bg-gray-50 print:bg-gray-100 p-4 rounded mb-6">
-            <h3 className="font-bold mb-2">VEHICLE DETAILS:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="mb-6">
+            <h3 className="text-sm font-bold mb-2">VEHICLE DETAILS:</h3>
+            <div className="grid grid-cols-2 gap-8 text-sm">
               <div>
                 <p><strong>Vehicle:</strong> {vehicle.make} {vehicle.model}</p>
                 <p><strong>Registration:</strong> {vehicle.vehicle_number}</p>
               </div>
               <div>
                 <p><strong>Type:</strong> {vehicle.vehicle_type}</p>
-                {vehicle.year && <p><strong>Year:</strong> {vehicle.year}</p>}
                 {invoice.kilometers && (
                   <p><strong>Kilometers:</strong> {invoice.kilometers.toLocaleString()} km</p>
                 )}
@@ -133,26 +146,94 @@ const UnifiedInvoicePrintPreview = ({
         )}
 
         {/* Items Table */}
-        <InvoiceItemsTable 
-          invoiceItems={invoiceItems}
-          invoice={invoice}
-          loading={loading}
-        />
+        <div className="mb-6">
+          <table className="w-full border border-black text-sm">
+            <thead>
+              <tr className="border-b border-black">
+                <th className="border-r border-black p-2 text-left font-semibold">Description</th>
+                <th className="border-r border-black p-2 text-center font-semibold">HSN/SAC Code</th>
+                <th className="border-r border-black p-2 text-center font-semibold">Qty</th>
+                <th className="border-r border-black p-2 text-right font-semibold">Rate</th>
+                <th className="border-r border-black p-2 text-right font-semibold">Discount</th>
+                <th className="p-2 text-right font-semibold">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="p-4 text-center">Loading items...</td>
+                </tr>
+              ) : invoiceItems && invoiceItems.length > 0 ? (
+                invoiceItems.map((item, index) => (
+                  <tr key={index} className="border-b border-gray-300">
+                    <td className="border-r border-black p-2">
+                      <div>
+                        <span className="font-medium">{item.name}</span>
+                        <div className="text-xs text-gray-600">({item.item_type})</div>
+                      </div>
+                    </td>
+                    <td className="border-r border-black p-2 text-center">{item.sac_hsn_code}</td>
+                    <td className="border-r border-black p-2 text-center">{item.quantity} {item.unit_type || 'nos'}</td>
+                    <td className="border-r border-black p-2 text-right">₹{item.unit_price.toFixed(2)}</td>
+                    <td className="border-r border-black p-2 text-right">₹{(item.discount_amount || 0).toFixed(2)}</td>
+                    <td className="p-2 text-right">₹{item.total_amount.toFixed(2)}</td>
+                  </tr>
+                ))
+              ) : (
+                <>
+                  {/* Show labor charges if available */}
+                  {invoice.labor_charges && invoice.labor_charges > 0 && (
+                    <tr className="border-b border-gray-300">
+                      <td className="border-r border-black p-2">
+                        <span className="font-medium">Labor Charges</span>
+                        <div className="text-xs text-gray-600">(Service)</div>
+                      </td>
+                      <td className="border-r border-black p-2 text-center">9988</td>
+                      <td className="border-r border-black p-2 text-center">1 nos</td>
+                      <td className="border-r border-black p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
+                      <td className="border-r border-black p-2 text-right">₹0.00</td>
+                      <td className="p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
+                    </tr>
+                  )}
+                  
+                  {/* Show extra charges if available */}
+                  {invoice.extra_charges && Array.isArray(invoice.extra_charges) && invoice.extra_charges.length > 0 && (
+                    invoice.extra_charges.map((charge, index) => (
+                      <tr key={index} className="border-b border-gray-300">
+                        <td className="border-r border-black p-2">
+                          <span className="font-medium">{charge.description}</span>
+                          <div className="text-xs text-gray-600">(Extra Charge)</div>
+                        </td>
+                        <td className="border-r border-black p-2 text-center">-</td>
+                        <td className="border-r border-black p-2 text-center">1 nos</td>
+                        <td className="border-r border-black p-2 text-right">₹{charge.amount.toFixed(2)}</td>
+                        <td className="border-r border-black p-2 text-right">₹0.00</td>
+                        <td className="p-2 text-right">₹{charge.amount.toFixed(2)}</td>
+                      </tr>
+                    ))
+                  )}
+                  
+                  {/* Show message if no items at all */}
+                  {(!invoice.labor_charges || invoice.labor_charges === 0) && 
+                   (!invoice.extra_charges || !Array.isArray(invoice.extra_charges) || invoice.extra_charges.length === 0) && (
+                    <tr>
+                      <td colSpan={6} className="p-4 text-center text-gray-500">No items found for this invoice</td>
+                    </tr>
+                  )}
+                </>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Totals */}
-        <div className="flex justify-end mb-8">
-          <div className="w-full md:w-1/2 space-y-2">
+        {/* Totals Section */}
+        <div className="flex justify-end mb-6">
+          <div className="w-80 space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Subtotal:</span>
               <span>₹{(invoice.subtotal || 0).toFixed(2)}</span>
             </div>
-            {invoice.discount_amount > 0 && (
-              <div className="flex justify-between text-green-600">
-                <span>Discount:</span>
-                <span>-₹{(invoice.discount_amount || 0).toFixed(2)}</span>
-              </div>
-            )}
-            {invoice.invoice_type === 'gst' && invoice.total_gst_amount > 0 && (
+            {invoice.invoice_type === 'gst' && (
               <>
                 <div className="flex justify-between">
                   <span>CGST:</span>
@@ -162,14 +243,10 @@ const UnifiedInvoicePrintPreview = ({
                   <span>SGST:</span>
                   <span>₹{(invoice.sgst_amount || 0).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Total GST:</span>
-                  <span>₹{(invoice.total_gst_amount || 0).toFixed(2)}</span>
-                </div>
               </>
             )}
             <div className="border-t-2 border-black pt-2">
-              <div className="flex justify-between font-bold text-lg">
+              <div className="flex justify-between font-bold">
                 <span>Total Amount:</span>
                 <span>₹{(invoice.total || 0).toFixed(2)}</span>
               </div>
@@ -177,29 +254,13 @@ const UnifiedInvoicePrintPreview = ({
           </div>
         </div>
 
-        {/* Notes */}
-        {invoice.notes && (
-          <div className="mb-6">
-            <h3 className="font-bold mb-2">NOTES:</h3>
-            <p className="text-sm border p-3 rounded">{invoice.notes}</p>
-          </div>
-        )}
-
-        {/* Terms and Signature */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-          <div>
-            <h3 className="font-bold mb-2">TERMS & CONDITIONS:</h3>
-            <div className="text-sm space-y-1">
-              <p>• Payment is due within 30 days</p>
-              <p>• All services carry warranty as per terms</p>
-              <p>• Vehicle will be released only after payment</p>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="border-t border-black mt-16 pt-2">
-              <p className="font-bold">Authorized Signature</p>
-              <p className="text-sm">OM MURUGAN AUTO WORKS</p>
-            </div>
+        {/* Terms and Conditions */}
+        <div className="mt-8">
+          <h3 className="text-sm font-bold mb-2">TERMS & CONDITIONS:</h3>
+          <div className="text-xs space-y-1">
+            <p>• Payment is due within 30 days</p>
+            <p>• All services carry warranty as per terms</p>
+            <p>• Vehicle will be released only after payment</p>
           </div>
         </div>
       </div>
