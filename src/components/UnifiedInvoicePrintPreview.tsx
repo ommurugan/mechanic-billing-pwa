@@ -1,9 +1,6 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Share, Printer, X } from "lucide-react";
-import InvoiceHeader from "./invoice/InvoiceHeader";
-import InvoiceItemsTable from "./invoice/InvoiceItemsTable";
 
 interface UnifiedInvoicePrintPreviewProps {
   invoice: any;
@@ -81,11 +78,11 @@ const UnifiedInvoicePrintPreview = ({
       </div>
 
       {/* Invoice content - this will be printed */}
-      <div className="print-content max-w-4xl mx-auto p-6 print:p-4 print:max-w-none print:mx-0 bg-white">
+      <div className="print-content max-w-4xl mx-auto p-4 print:p-2 print:max-w-none print:mx-0 bg-white">
         {/* Company Header */}
-        <div className="text-center mb-6 border-b border-gray-300 pb-4">
+        <div className="text-center mb-3 border-b border-gray-300 pb-2">
           <h1 className="text-2xl font-bold text-black">OM MURUGAN AUTO WORKS</h1>
-          <p className="text-sm text-gray-600 mb-2">Complete Auto Care Solutions</p>
+          <p className="text-sm text-gray-600 mb-1">Complete Auto Care Solutions</p>
           <p className="text-xs text-gray-600 mb-1">
             Door No.8, 4th Main Road, Manikandapuram, Thirumullaivoyal,
           </p>
@@ -101,10 +98,10 @@ const UnifiedInvoicePrintPreview = ({
         </div>
 
         {/* Bill To and Invoice Details */}
-        <div className="grid grid-cols-2 gap-8 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-3">
           <div>
-            <h3 className="text-sm font-bold mb-2">BILL TO:</h3>
-            <div className="text-sm space-y-1">
+            <h3 className="text-sm font-bold mb-1">BILL TO:</h3>
+            <div className="text-sm space-y-0.5">
               <p className="font-semibold">{customer?.name || 'N/A'}</p>
               <p>{customer?.phone || 'N/A'}</p>
               {customer?.email && <p>- {customer.email}</p>}
@@ -115,7 +112,7 @@ const UnifiedInvoicePrintPreview = ({
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm space-y-1">
+            <div className="text-sm space-y-0.5">
               <p><strong>Invoice No:</strong> {invoice.invoice_number}</p>
               <p><strong>Date:</strong> {formatDate(invoice.created_at)}</p>
               {invoice.due_date && (
@@ -128,9 +125,9 @@ const UnifiedInvoicePrintPreview = ({
 
         {/* Vehicle Details */}
         {vehicle && (
-          <div className="mb-6">
-            <h3 className="text-sm font-bold mb-2">VEHICLE DETAILS:</h3>
-            <div className="grid grid-cols-2 gap-8 text-sm">
+          <div className="mb-3">
+            <h3 className="text-sm font-bold mb-1">VEHICLE DETAILS:</h3>
+            <div className="grid grid-cols-2 gap-6 text-sm">
               <div>
                 <p><strong>Vehicle:</strong> {vehicle.make} {vehicle.model}</p>
                 <p><strong>Registration:</strong> {vehicle.vehicle_number}</p>
@@ -146,7 +143,7 @@ const UnifiedInvoicePrintPreview = ({
         )}
 
         {/* Items Table */}
-        <div className="mb-6">
+        <div className="mb-3">
           <table className="w-full border border-black text-sm">
             <thead>
               <tr className="border-b border-black">
@@ -227,8 +224,8 @@ const UnifiedInvoicePrintPreview = ({
         </div>
 
         {/* Totals Section */}
-        <div className="flex justify-end mb-6">
-          <div className="w-80 space-y-2 text-sm">
+        <div className="flex justify-end mb-3">
+          <div className="w-80 space-y-1 text-sm">
             <div className="flex justify-between">
               <span>Subtotal:</span>
               <span>₹{(invoice.subtotal || 0).toFixed(2)}</span>
@@ -245,7 +242,7 @@ const UnifiedInvoicePrintPreview = ({
                 </div>
               </>
             )}
-            <div className="border-t-2 border-black pt-2">
+            <div className="border-t-2 border-black pt-1">
               <div className="flex justify-between font-bold">
                 <span>Total Amount:</span>
                 <span>₹{(invoice.total || 0).toFixed(2)}</span>
@@ -255,9 +252,9 @@ const UnifiedInvoicePrintPreview = ({
         </div>
 
         {/* Terms and Conditions */}
-        <div className="mt-8">
-          <h3 className="text-sm font-bold mb-2">TERMS & CONDITIONS:</h3>
-          <div className="text-xs space-y-1">
+        <div className="mt-2">
+          <h3 className="text-sm font-bold mb-1">TERMS & CONDITIONS:</h3>
+          <div className="text-xs space-y-0.5">
             <p>• Payment is due within 30 days</p>
             <p>• All services carry warranty as per terms</p>
             <p>• Vehicle will be released only after payment</p>
@@ -272,6 +269,11 @@ const UnifiedInvoicePrintPreview = ({
             color-adjust: exact !important;
           }
           
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          
           .fixed {
             position: static !important;
           }
@@ -279,52 +281,114 @@ const UnifiedInvoicePrintPreview = ({
           .print-content {
             max-width: none !important;
             margin: 0 !important;
-            padding: 15px !important;
+            padding: 0.3in !important;
+            font-size: 10px !important;
+            line-height: 1.1 !important;
           }
           
           .print\\:hidden {
             display: none !important;
           }
           
-          .print\\:bg-gray-100 {
-            background-color: #f3f4f6 !important;
+          .print\\:p-2 {
+            padding: 0.3in !important;
           }
           
           @page {
-            margin: 0.5in;
+            margin: 0.2in;
             size: A4;
           }
           
-          /* Ensure single page printing */
-          body {
-            margin: 0;
-            padding: 0;
+          /* Compact headers */
+          .print-content h1 {
+            font-size: 14px !important;
+            margin-bottom: 0.1em !important;
           }
           
-          /* Prevent page breaks within important sections */
-          .print-content > div {
-            page-break-inside: avoid;
-          }
-          
-          /* Optimize space usage */
-          .print-content {
-            font-size: 12px;
-            line-height: 1.4;
-          }
-          
-          .print-content h1, .print-content h2, .print-content h3 {
-            margin-top: 0;
-            margin-bottom: 0.5em;
+          .print-content h3 {
+            font-size: 9px !important;
+            margin-bottom: 0.05em !important;
+            margin-top: 0.2em !important;
           }
           
           .print-content p {
-            margin: 0.2em 0;
+            margin: 0.03em 0 !important;
+            font-size: 8px !important;
           }
           
+          /* Compact table */
           .print-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0.5em 0;
+            margin: 0.1em 0 !important;
+            font-size: 8px !important;
+            width: 100% !important;
+          }
+          
+          .print-content table th,
+          .print-content table td {
+            padding: 0.05em 0.1em !important;
+            font-size: 8px !important;
+          }
+          
+          /* Force everything on one page */
+          .print-content {
+            page-break-inside: avoid;
+            height: auto;
+            overflow: visible;
+          }
+          
+          /* Reduce all margins */
+          .mb-3 {
+            margin-bottom: 0.1em !important;
+          }
+          
+          .mt-2 {
+            margin-top: 0.1em !important;
+          }
+          
+          .pb-2 {
+            padding-bottom: 0.05em !important;
+          }
+          
+          .space-y-0\\.5 > * + * {
+            margin-top: 0.02em !important;
+          }
+          
+          .space-y-1 > * + * {
+            margin-top: 0.02em !important;
+          }
+          
+          /* Grid gap reduction */
+          .gap-6 {
+            gap: 0.3em !important;
+          }
+          
+          /* Terms section */
+          .print-content > div:last-child {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-top: 0.05em !important;
+          }
+          
+          /* Text sizes */
+          .text-xs {
+            font-size: 7px !important;
+          }
+          
+          .text-sm {
+            font-size: 8px !important;
+          }
+          
+          .text-2xl {
+            font-size: 14px !important;
+          }
+          
+          /* Border adjustments */
+          .border-b {
+            border-bottom-width: 1px !important;
+          }
+          
+          .border-t-2 {
+            border-top-width: 1px !important;
           }
         }
       `}</style>
