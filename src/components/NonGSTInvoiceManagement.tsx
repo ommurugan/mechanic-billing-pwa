@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,6 +43,8 @@ const NonGSTInvoiceManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [printInvoice, setPrintInvoice] = useState<any>(null);
+  const [printInvoiceItems, setPrintInvoiceItems] = useState<any[]>([]);
+  const [printLoading, setPrintLoading] = useState(false);
   const [showPaidNotification, setShowPaidNotification] = useState(false);
 
   const fetchData = async () => {
@@ -180,8 +181,33 @@ const NonGSTInvoiceManagement = () => {
     setSelectedInvoice(null);
   };
 
-  const handleViewInvoice = (invoice: any) => {
+  const fetchInvoiceItems = async (invoiceId: string) => {
+    try {
+      setPrintLoading(true);
+      const { data: invoiceItems, error } = await supabase
+        .from('invoice_items')
+        .select('*')
+        .eq('invoice_id', invoiceId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching invoice items:', error);
+        return [];
+      }
+
+      return invoiceItems || [];
+    } catch (error) {
+      console.error('Error fetching invoice items:', error);
+      return [];
+    } finally {
+      setPrintLoading(false);
+    }
+  };
+
+  const handleViewInvoice = async (invoice: any) => {
     setPrintInvoice(invoice);
+    const items = await fetchInvoiceItems(invoice.id);
+    setPrintInvoiceItems(items);
     setShowPrintPreview(true);
   };
 
@@ -211,8 +237,10 @@ const NonGSTInvoiceManagement = () => {
     }
   };
 
-  const handlePrintInvoice = (invoice: any) => {
+  const handlePrintInvoice = async (invoice: any) => {
     setPrintInvoice(invoice);
+    const items = await fetchInvoiceItems(invoice.id);
+    setPrintInvoiceItems(items);
     setShowPrintPreview(true);
   };
 
@@ -266,9 +294,12 @@ const NonGSTInvoiceManagement = () => {
         invoice={printInvoice}
         customer={customers.find(c => c.id === printInvoice.customer_id)}
         vehicle={vehicles.find(v => v.id === printInvoice.vehicle_id)}
+        invoiceItems={printInvoiceItems}
+        loading={printLoading}
         onClose={() => {
           setShowPrintPreview(false);
           setPrintInvoice(null);
+          setPrintInvoiceItems([]);
         }}
       />
     );
@@ -506,6 +537,7 @@ const NonGSTInvoiceManagement = () => {
                 onPrint={handlePrintInvoice}
                 onMarkPaid={() => handleMarkAsPaid(invoice.id)}
                 onUndoPaid={() => handleUndoPaid(invoice.id)}
+                onView={handleViewInvoice}
               />
             ))}
           </div>

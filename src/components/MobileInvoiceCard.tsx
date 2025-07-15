@@ -1,13 +1,15 @@
 
+import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Eye,
-  Printer,
-  Trash2,
-  Check,
+  Edit, 
+  Trash2, 
+  Printer, 
+  Check, 
   Clock,
+  Eye,
   CheckCircle,
   AlertCircle,
   Receipt,
@@ -21,8 +23,9 @@ interface MobileInvoiceCardProps {
   onEdit: (invoice: any) => void;
   onDelete: (invoiceId: string) => void;
   onPrint: (invoice: any) => void;
-  onMarkPaid?: (invoiceId: string) => void;
-  onUndoPaid?: (invoiceId: string) => void;
+  onMarkPaid: () => void;
+  onUndoPaid: () => void;
+  onView?: (invoice: any) => void;
 }
 
 const MobileInvoiceCard = ({ 
@@ -31,9 +34,10 @@ const MobileInvoiceCard = ({
   vehicleInfo, 
   onEdit, 
   onDelete, 
-  onPrint,
-  onMarkPaid,
-  onUndoPaid
+  onPrint, 
+  onMarkPaid, 
+  onUndoPaid,
+  onView 
 }: MobileInvoiceCardProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -51,90 +55,102 @@ const MobileInvoiceCard = ({
       case 'paid': return <CheckCircle className="h-4 w-4" />;
       case 'pending': return <Clock className="h-4 w-4" />;
       case 'overdue': return <AlertCircle className="h-4 w-4" />;
-      case 'draft': return <Receipt className="h-4 w-4" />;
+      case 'draft': return <Edit className="h-4 w-4" />;
       case 'cancelled': return <X className="h-4 w-4" />;
       default: return <Receipt className="h-4 w-4" />;
     }
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card>
       <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              {getStatusIcon(invoice.status)}
+        <div className="space-y-3">
+          {/* Header with status */}
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                {getStatusIcon(invoice.status)}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">{invoice.invoice_number}</p>
+                <Badge variant={getStatusColor(invoice.status)} className="capitalize text-xs">
+                  {invoice.status}
+                </Badge>
+              </div>
             </div>
-            <div>
-              <p className="font-medium text-sm">{invoice.invoice_number}</p>
-              <Badge variant={getStatusColor(invoice.status)} className="text-xs mt-1">
-                {invoice.status}
-              </Badge>
+            <div className="text-right">
+              <p className="font-bold text-lg">₹{(invoice.total || 0).toFixed(2)}</p>
+              {invoice.invoice_type === 'gst' && invoice.total_gst_amount > 0 && (
+                <p className="text-xs text-gray-500">Tax: ₹{(invoice.total_gst_amount || 0).toFixed(2)}</p>
+              )}
             </div>
           </div>
-          <div className="text-right">
-            <p className="font-semibold">₹{(invoice.total || 0).toFixed(2)}</p>
+
+          {/* Customer and Vehicle Info */}
+          <div className="space-y-1">
+            <p className="text-sm text-gray-600"><strong>Customer:</strong> {customerName}</p>
+            <p className="text-sm text-gray-600"><strong>Vehicle:</strong> {vehicleInfo}</p>
             <p className="text-xs text-gray-500">
-              Tax: ₹{(invoice.total_gst_amount || 0).toFixed(2)}
+              Created: {new Date(invoice.created_at).toLocaleDateString()}
+              {invoice.kilometers && (
+                <span className="ml-2">• KM: {invoice.kilometers.toLocaleString()}</span>
+              )}
             </p>
+            {invoice.invoice_type === 'gst' && invoice.customer_id && (
+              <p className="text-xs text-gray-500">GST Number available</p>
+            )}
           </div>
-        </div>
 
-        <div className="space-y-1 mb-3">
-          <p className="text-sm text-gray-600">{customerName}</p>
-          <p className="text-sm text-gray-600">{vehicleInfo}</p>
-          <p className="text-xs text-gray-500">
-            Created: {new Date(invoice.created_at).toLocaleDateString()}
-          </p>
-          {invoice.kilometers && (
-            <p className="text-xs text-gray-500">
-              KM: {invoice.kilometers.toLocaleString()}
-            </p>
-          )}
-        </div>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-2">
+            {onView && (
+              <Button size="sm" variant="outline" onClick={() => onView(invoice)} className="flex-1">
+                <Eye className="h-4 w-4 mr-1" />
+                View
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={() => onEdit(invoice)} className="flex-1">
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => onPrint(invoice)} className="flex-1">
+              <Printer className="h-4 w-4 mr-1" />
+              Print
+            </Button>
+          </div>
 
-        <div className="flex gap-2">
-          <Button size="sm" variant="ghost" onClick={() => onEdit(invoice)} className="flex-1">
-            <Eye className="h-4 w-4 mr-1" />
-            View
-          </Button>
-          
-          {invoice.status === 'pending' && onMarkPaid && (
+          <div className="flex flex-wrap gap-2">
+            {invoice.status === 'pending' && (
+              <Button 
+                size="sm" 
+                onClick={onMarkPaid}
+                className="bg-green-600 hover:bg-green-700 text-white flex-1"
+              >
+                <Check className="h-4 w-4 mr-1" />
+                Mark Paid
+              </Button>
+            )}
+            {invoice.status === 'paid' && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={onUndoPaid}
+                className="text-orange-600 border-orange-600 hover:bg-orange-50 flex-1"
+              >
+                <Clock className="h-4 w-4 mr-1" />
+                Undo Paid
+              </Button>
+            )}
             <Button 
               size="sm" 
-              variant="ghost" 
-              onClick={() => onMarkPaid(invoice.id)}
-              className="text-green-600 hover:text-green-700"
-              title="Mark as Paid"
+              variant="outline" 
+              onClick={() => onDelete(invoice.id)}
+              className="text-red-500 border-red-500 hover:bg-red-50 flex-1"
             >
-              <Check className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete
             </Button>
-          )}
-          
-          {invoice.status === 'paid' && onUndoPaid && (
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={() => onUndoPaid(invoice.id)}
-              className="text-orange-600 hover:text-orange-700"
-              title="Undo Paid Status"
-            >
-              <Clock className="h-4 w-4" />
-            </Button>
-          )}
-          
-          <Button size="sm" variant="ghost" onClick={() => onPrint(invoice)}>
-            <Printer className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            onClick={() => onDelete(invoice.id)}
-            className="text-red-500 hover:text-red-700"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

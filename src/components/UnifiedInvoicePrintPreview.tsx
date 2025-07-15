@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Share, Printer, X } from "lucide-react";
@@ -217,12 +218,52 @@ const UnifiedInvoicePrintPreview = ({
           .print-content {
             max-width: none !important;
             margin: 0 !important;
-            padding: 20px !important;
+            padding: 15px !important;
+          }
+          
+          .print\\:hidden {
+            display: none !important;
+          }
+          
+          .print\\:bg-gray-100 {
+            background-color: #f3f4f6 !important;
           }
           
           @page {
             margin: 0.5in;
             size: A4;
+          }
+          
+          /* Ensure single page printing */
+          body {
+            margin: 0;
+            padding: 0;
+          }
+          
+          /* Prevent page breaks within important sections */
+          .print-content > div {
+            page-break-inside: avoid;
+          }
+          
+          /* Optimize space usage */
+          .print-content {
+            font-size: 12px;
+            line-height: 1.4;
+          }
+          
+          .print-content h1, .print-content h2, .print-content h3 {
+            margin-top: 0;
+            margin-bottom: 0.5em;
+          }
+          
+          .print-content p {
+            margin: 0.2em 0;
+          }
+          
+          .print-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.5em 0;
           }
         }
       `}</style>
