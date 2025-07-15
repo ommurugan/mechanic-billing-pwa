@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import NonGSTInvoiceForm from "./NonGSTInvoiceForm";
 import MobileInvoiceCard from "./MobileInvoiceCard";
-import InvoiceViewModal from "./InvoiceViewModal";
+import UnifiedInvoicePrintPreview from "./UnifiedInvoicePrintPreview";
 
 const NonGSTInvoiceManagement = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -42,8 +42,8 @@ const NonGSTInvoiceManagement = () => {
   const [customers, setCustomers] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [viewInvoice, setViewInvoice] = useState<any>(null);
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
+  const [printInvoice, setPrintInvoice] = useState<any>(null);
   const [showPaidNotification, setShowPaidNotification] = useState(false);
 
   const fetchData = async () => {
@@ -181,8 +181,8 @@ const NonGSTInvoiceManagement = () => {
   };
 
   const handleViewInvoice = (invoice: any) => {
-    setViewInvoice(invoice);
-    setShowViewModal(true);
+    setPrintInvoice(invoice);
+    setShowPrintPreview(true);
   };
 
   const handleEditInvoice = (invoice: any) => {
@@ -212,11 +212,8 @@ const NonGSTInvoiceManagement = () => {
   };
 
   const handlePrintInvoice = (invoice: any) => {
-    setViewInvoice(invoice);
-    setShowViewModal(true);
-    setTimeout(() => {
-      window.print();
-    }, 500);
+    setPrintInvoice(invoice);
+    setShowPrintPreview(true);
   };
 
   const invoiceStats = {
@@ -259,6 +256,21 @@ const NonGSTInvoiceManagement = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
+    );
+  }
+
+  // Show print preview
+  if (showPrintPreview && printInvoice) {
+    return (
+      <UnifiedInvoicePrintPreview
+        invoice={printInvoice}
+        customer={customers.find(c => c.id === printInvoice.customer_id)}
+        vehicle={vehicles.find(v => v.id === printInvoice.vehicle_id)}
+        onClose={() => {
+          setShowPrintPreview(false);
+          setPrintInvoice(null);
+        }}
+      />
     );
   }
 
@@ -499,21 +511,6 @@ const NonGSTInvoiceManagement = () => {
           </div>
         )}
       </div>
-
-      {/* View Invoice Modal */}
-      {viewInvoice && (
-        <InvoiceViewModal
-          isOpen={showViewModal}
-          onClose={() => {
-            setShowViewModal(false);
-            setViewInvoice(null);
-          }}
-          invoice={viewInvoice}
-          customer={customers.find(c => c.id === viewInvoice.customer_id)}
-          vehicle={vehicles.find(v => v.id === viewInvoice.vehicle_id)}
-          onPrint={() => window.print()}
-        />
-      )}
 
       {/* Paid Invoice Notification Dialog */}
       <Dialog open={showPaidNotification} onOpenChange={setShowPaidNotification}>
