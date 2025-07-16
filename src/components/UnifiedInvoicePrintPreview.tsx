@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Share, Printer, X } from "lucide-react";
@@ -44,6 +45,8 @@ const UnifiedInvoicePrintPreview = ({
     return new Date(dateString).toLocaleDateString('en-IN');
   };
 
+  const isGSTInvoice = invoice.invoice_type === 'gst';
+
   return (
     <div className="fixed inset-0 bg-white z-50 overflow-auto">
       {/* Screen controls - hidden when printing */}
@@ -78,72 +81,84 @@ const UnifiedInvoicePrintPreview = ({
       </div>
 
       {/* Invoice content - this will be printed */}
-      <div className="print-content max-w-4xl mx-auto p-4 print:p-2 print:max-w-none print:mx-0 bg-white">
+      <div className="print-content max-w-4xl mx-auto p-4 print:p-1 print:max-w-none print:mx-0 bg-white">
         {/* Company Header with Logo */}
-        <div className="text-center mb-3 border-b border-black pb-2">
+        <div className="text-center mb-2 border-b border-black pb-1">
           {/* Logo Section */}
-          <div className="flex justify-center items-center mb-2">
-            <div className="w-16 h-16 border-2 border-black rounded-full flex items-center justify-center mr-3">
+          <div className="flex justify-center items-center mb-1">
+            <div className="w-12 h-12 border-2 border-black rounded-full flex items-center justify-center mr-2">
               <div className="text-center">
-                <div className="text-xs font-bold">OM MURUGAN</div>
-                <div className="text-[8px]">AUTO WORKS</div>
+                <div className="text-[8px] font-bold">OM MURUGAN</div>
+                <div className="text-[6px]">AUTO WORKS</div>
               </div>
             </div>
             <div className="text-left">
-              <h1 className="text-2xl font-bold text-black">OM MURUGAN AUTO WORKS</h1>
-              <p className="text-sm text-gray-600">Complete Auto Care Solutions</p>
+              <h1 className="text-xl font-bold text-black">OM MURUGAN AUTO WORKS</h1>
+              <p className="text-xs text-gray-600">Complete Auto Care Solutions</p>
             </div>
           </div>
           
-          <p className="text-xs text-gray-600 mb-1">
+          <p className="text-[10px] text-gray-600 mb-1">
             Door No.8, 4th Main Road, Manikandapuram, Thirumullaivoyal,
           </p>
-          <p className="text-xs text-gray-600 mb-2">Chennai-600 062</p>
+          <p className="text-[10px] text-gray-600 mb-1">Chennai-600 062</p>
           
-          {/* Company details line */}
-          <div className="text-xs border-t border-black pt-1">
-            <div className="flex justify-center items-center gap-6 mb-1">
-              <span><strong>GSTIN/UIN:</strong> 33AXNPGZ468F1ZR</span>
-              <span><strong>State Name:</strong> Tamil Nadu, <strong>Code:</strong> 33</span>
+          {/* Company details line - show GST details only for GST invoices */}
+          {isGSTInvoice && (
+            <div className="text-[10px] border-t border-black pt-1">
+              <div className="flex justify-center items-center gap-4 mb-1">
+                <span><strong>GSTIN/UIN:</strong> 33AXNPGZ468F1ZR</span>
+                <span><strong>State Name:</strong> Tamil Nadu, <strong>Code:</strong> 33</span>
+              </div>
+              <div className="flex justify-center items-center gap-4">
+                <span><strong>E-Mail:</strong> gopalakrishn.p8@gmail.com</span>
+                <span><strong>Phone:</strong> + 91 9884551560</span>
+              </div>
             </div>
-            <div className="flex justify-center items-center gap-6">
-              <span><strong>E-Mail:</strong> gopalakrishn.p8@gmail.com</span>
-              <span><strong>Phone:</strong> + 91 9884551560</span>
+          )}
+          
+          {/* For Non-GST invoices, show simpler contact details */}
+          {!isGSTInvoice && (
+            <div className="text-[10px] border-t border-black pt-1">
+              <div className="flex justify-center items-center gap-4">
+                <span><strong>E-Mail:</strong> gopalakrishn.p8@gmail.com</span>
+                <span><strong>Phone:</strong> + 91 9884551560</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Bill To and Invoice Details */}
-        <div className="grid grid-cols-2 gap-6 mb-3">
+        <div className="grid grid-cols-2 gap-4 mb-2">
           <div>
-            <h3 className="text-sm font-bold mb-1">BILL TO:</h3>
-            <div className="text-sm space-y-0.5">
+            <h3 className="text-xs font-bold mb-1">BILL TO:</h3>
+            <div className="text-[10px] space-y-0.5">
               <p className="font-semibold">{customer?.name || 'N/A'}</p>
               <p>{customer?.phone || 'N/A'}</p>
               {customer?.email && <p>- {customer.email}</p>}
               {customer?.address && <p>{customer.address}</p>}
-              {customer?.gst_number && (
+              {isGSTInvoice && customer?.gst_number && (
                 <p><strong>GST No:</strong> {customer.gst_number}</p>
               )}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm space-y-0.5">
+            <div className="text-[10px] space-y-0.5">
               <p><strong>Invoice No:</strong> {invoice.invoice_number}</p>
               <p><strong>Date:</strong> {formatDate(invoice.created_at)}</p>
               {invoice.due_date && (
                 <p><strong>Due Date:</strong> {formatDate(invoice.due_date)}</p>
               )}
-              <p><strong>Invoice Type:</strong> {invoice.invoice_type === 'gst' ? 'GST Invoice' : 'Non-GST Invoice'}</p>
+              <p><strong>Invoice Type:</strong> {isGSTInvoice ? 'GST Invoice' : 'Non-GST Invoice'}</p>
             </div>
           </div>
         </div>
 
         {/* Vehicle Details */}
         {vehicle && (
-          <div className="mb-3">
-            <h3 className="text-sm font-bold mb-1">VEHICLE DETAILS:</h3>
-            <div className="grid grid-cols-2 gap-6 text-sm">
+          <div className="mb-2">
+            <h3 className="text-xs font-bold mb-1">VEHICLE DETAILS:</h3>
+            <div className="grid grid-cols-2 gap-4 text-[10px]">
               <div>
                 <p><strong>Vehicle:</strong> {vehicle.make} {vehicle.model}</p>
                 <p><strong>Registration:</strong> {vehicle.vehicle_number}</p>
@@ -159,37 +174,37 @@ const UnifiedInvoicePrintPreview = ({
         )}
 
         {/* Items Table */}
-        <div className="mb-3">
-          <table className="w-full border border-black text-sm">
+        <div className="mb-2">
+          <table className="w-full border border-black text-[10px]">
             <thead>
               <tr className="border-b border-black">
-                <th className="border-r border-black p-2 text-left font-semibold">Description</th>
-                <th className="border-r border-black p-2 text-center font-semibold">HSN/SAC Code</th>
-                <th className="border-r border-black p-2 text-center font-semibold">Qty</th>
-                <th className="border-r border-black p-2 text-right font-semibold">Rate</th>
-                <th className="border-r border-black p-2 text-right font-semibold">Discount</th>
-                <th className="p-2 text-right font-semibold">Amount</th>
+                <th className="border-r border-black p-1 text-left font-semibold">Description</th>
+                <th className="border-r border-black p-1 text-center font-semibold">HSN/SAC Code</th>
+                <th className="border-r border-black p-1 text-center font-semibold">Qty</th>
+                <th className="border-r border-black p-1 text-right font-semibold">Rate</th>
+                <th className="border-r border-black p-1 text-right font-semibold">Discount</th>
+                <th className="p-1 text-right font-semibold">Amount</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="p-4 text-center">Loading items...</td>
+                  <td colSpan={6} className="p-2 text-center">Loading items...</td>
                 </tr>
               ) : invoiceItems && invoiceItems.length > 0 ? (
                 invoiceItems.map((item, index) => (
                   <tr key={index} className="border-b border-gray-300">
-                    <td className="border-r border-black p-2">
+                    <td className="border-r border-black p-1">
                       <div>
                         <span className="font-medium">{item.name}</span>
-                        <div className="text-xs text-gray-600">({item.item_type})</div>
+                        <div className="text-[8px] text-gray-600">({item.item_type})</div>
                       </div>
                     </td>
-                    <td className="border-r border-black p-2 text-center">{item.sac_hsn_code}</td>
-                    <td className="border-r border-black p-2 text-center">{item.quantity} {item.unit_type || 'nos'}</td>
-                    <td className="border-r border-black p-2 text-right">₹{item.unit_price.toFixed(2)}</td>
-                    <td className="border-r border-black p-2 text-right">₹{(item.discount_amount || 0).toFixed(2)}</td>
-                    <td className="p-2 text-right">₹{item.total_amount.toFixed(2)}</td>
+                    <td className="border-r border-black p-1 text-center">{item.sac_hsn_code}</td>
+                    <td className="border-r border-black p-1 text-center">{item.quantity} {item.unit_type || 'nos'}</td>
+                    <td className="border-r border-black p-1 text-right">₹{item.unit_price.toFixed(2)}</td>
+                    <td className="border-r border-black p-1 text-right">₹{(item.discount_amount || 0).toFixed(2)}</td>
+                    <td className="p-1 text-right">₹{item.total_amount.toFixed(2)}</td>
                   </tr>
                 ))
               ) : (
@@ -197,15 +212,15 @@ const UnifiedInvoicePrintPreview = ({
                   {/* Show labor charges if available */}
                   {invoice.labor_charges && invoice.labor_charges > 0 && (
                     <tr className="border-b border-gray-300">
-                      <td className="border-r border-black p-2">
+                      <td className="border-r border-black p-1">
                         <span className="font-medium">Labor Charges</span>
-                        <div className="text-xs text-gray-600">(Service)</div>
+                        <div className="text-[8px] text-gray-600">(Service)</div>
                       </td>
-                      <td className="border-r border-black p-2 text-center">9988</td>
-                      <td className="border-r border-black p-2 text-center">1 nos</td>
-                      <td className="border-r border-black p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
-                      <td className="border-r border-black p-2 text-right">₹0.00</td>
-                      <td className="p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
+                      <td className="border-r border-black p-1 text-center">9988</td>
+                      <td className="border-r border-black p-1 text-center">1 nos</td>
+                      <td className="border-r border-black p-1 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
+                      <td className="border-r border-black p-1 text-right">₹0.00</td>
+                      <td className="p-1 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
                     </tr>
                   )}
                   
@@ -213,15 +228,15 @@ const UnifiedInvoicePrintPreview = ({
                   {invoice.extra_charges && Array.isArray(invoice.extra_charges) && invoice.extra_charges.length > 0 && (
                     invoice.extra_charges.map((charge, index) => (
                       <tr key={index} className="border-b border-gray-300">
-                        <td className="border-r border-black p-2">
+                        <td className="border-r border-black p-1">
                           <span className="font-medium">{charge.description}</span>
-                          <div className="text-xs text-gray-600">(Extra Charge)</div>
+                          <div className="text-[8px] text-gray-600">(Extra Charge)</div>
                         </td>
-                        <td className="border-r border-black p-2 text-center">-</td>
-                        <td className="border-r border-black p-2 text-center">1 nos</td>
-                        <td className="border-r border-black p-2 text-right">₹{charge.amount.toFixed(2)}</td>
-                        <td className="border-r border-black p-2 text-right">₹0.00</td>
-                        <td className="p-2 text-right">₹{charge.amount.toFixed(2)}</td>
+                        <td className="border-r border-black p-1 text-center">-</td>
+                        <td className="border-r border-black p-1 text-center">1 nos</td>
+                        <td className="border-r border-black p-1 text-right">₹{charge.amount.toFixed(2)}</td>
+                        <td className="border-r border-black p-1 text-right">₹0.00</td>
+                        <td className="p-1 text-right">₹{charge.amount.toFixed(2)}</td>
                       </tr>
                     ))
                   )}
@@ -230,7 +245,7 @@ const UnifiedInvoicePrintPreview = ({
                   {(!invoice.labor_charges || invoice.labor_charges === 0) && 
                    (!invoice.extra_charges || !Array.isArray(invoice.extra_charges) || invoice.extra_charges.length === 0) && (
                     <tr>
-                      <td colSpan={6} className="p-4 text-center text-gray-500">No items found for this invoice</td>
+                      <td colSpan={6} className="p-2 text-center text-gray-500">No items found for this invoice</td>
                     </tr>
                   )}
                 </>
@@ -240,13 +255,13 @@ const UnifiedInvoicePrintPreview = ({
         </div>
 
         {/* Totals Section */}
-        <div className="flex justify-end mb-3">
-          <div className="w-80 space-y-1 text-sm">
+        <div className="flex justify-end mb-2">
+          <div className="w-64 space-y-1 text-[10px]">
             <div className="flex justify-between">
               <span>Subtotal:</span>
               <span>₹{(invoice.subtotal || 0).toFixed(2)}</span>
             </div>
-            {invoice.invoice_type === 'gst' && (
+            {isGSTInvoice && (
               <>
                 <div className="flex justify-between">
                   <span>CGST:</span>
@@ -268,9 +283,9 @@ const UnifiedInvoicePrintPreview = ({
         </div>
 
         {/* Terms and Conditions */}
-        <div className="mt-2">
-          <h3 className="text-sm font-bold mb-1">TERMS & CONDITIONS:</h3>
-          <div className="text-xs space-y-0.5">
+        <div className="mt-1">
+          <h3 className="text-xs font-bold mb-1">TERMS & CONDITIONS:</h3>
+          <div className="text-[8px] space-y-0.5">
             <p>• Payment is due within 30 days</p>
             <p>• All services carry warranty as per terms</p>
             <p>• Vehicle will be released only after payment</p>
@@ -297,8 +312,8 @@ const UnifiedInvoicePrintPreview = ({
           .print-content {
             max-width: none !important;
             margin: 0 !important;
-            padding: 0.3in !important;
-            font-size: 10px !important;
+            padding: 0.2in !important;
+            font-size: 9px !important;
             line-height: 1.1 !important;
           }
           
@@ -306,43 +321,43 @@ const UnifiedInvoicePrintPreview = ({
             display: none !important;
           }
           
-          .print\\:p-2 {
-            padding: 0.3in !important;
+          .print\\:p-1 {
+            padding: 0.2in !important;
           }
           
           @page {
-            margin: 0.2in;
+            margin: 0.1in;
             size: A4;
           }
           
           /* Compact headers */
           .print-content h1 {
-            font-size: 14px !important;
-            margin-bottom: 0.1em !important;
+            font-size: 12px !important;
+            margin-bottom: 0.05em !important;
           }
           
           .print-content h3 {
-            font-size: 9px !important;
-            margin-bottom: 0.05em !important;
-            margin-top: 0.2em !important;
+            font-size: 8px !important;
+            margin-bottom: 0.03em !important;
+            margin-top: 0.1em !important;
           }
           
           .print-content p {
-            margin: 0.03em 0 !important;
-            font-size: 8px !important;
+            margin: 0.02em 0 !important;
+            font-size: 7px !important;
           }
           
           /* Compact table */
           .print-content table {
-            margin: 0.1em 0 !important;
-            font-size: 8px !important;
+            margin: 0.05em 0 !important;
+            font-size: 7px !important;
             width: 100% !important;
           }
           
           .print-content table th,
           .print-content table td {
-            padding: 0.05em 0.1em !important;
-            font-size: 8px !important;
+            padding: 0.03em 0.05em !important;
+            font-size: 7px !important;
           }
           
           /* Force everything on one page */
@@ -353,49 +368,53 @@ const UnifiedInvoicePrintPreview = ({
           }
           
           /* Reduce all margins */
-          .mb-3 {
-            margin-bottom: 0.1em !important;
+          .mb-2 {
+            margin-bottom: 0.05em !important;
           }
           
-          .mt-2 {
-            margin-top: 0.1em !important;
+          .mt-1 {
+            margin-top: 0.05em !important;
           }
           
-          .pb-2 {
-            padding-bottom: 0.05em !important;
+          .pb-1 {
+            padding-bottom: 0.03em !important;
           }
           
           .space-y-0\\.5 > * + * {
-            margin-top: 0.02em !important;
+            margin-top: 0.01em !important;
           }
           
           .space-y-1 > * + * {
-            margin-top: 0.02em !important;
+            margin-top: 0.01em !important;
           }
           
           /* Grid gap reduction */
-          .gap-6 {
-            gap: 0.3em !important;
+          .gap-4 {
+            gap: 0.2em !important;
           }
           
           /* Terms section */
           .print-content > div:last-child {
             break-inside: avoid;
             page-break-inside: avoid;
-            margin-top: 0.05em !important;
+            margin-top: 0.03em !important;
           }
           
           /* Text sizes */
+          .text-\\[8px\\] {
+            font-size: 6px !important;
+          }
+          
+          .text-\\[10px\\] {
+            font-size: 7px !important;
+          }
+          
           .text-xs {
             font-size: 7px !important;
           }
           
-          .text-sm {
-            font-size: 8px !important;
-          }
-          
-          .text-2xl {
-            font-size: 14px !important;
+          .text-xl {
+            font-size: 12px !important;
           }
           
           /* Border adjustments */
@@ -405,6 +424,15 @@ const UnifiedInvoicePrintPreview = ({
           
           .border-t-2 {
             border-top-width: 1px !important;
+          }
+          
+          /* Logo size adjustment for print */
+          .w-12 {
+            width: 2rem !important;
+          }
+          
+          .h-12 {
+            height: 2rem !important;
           }
         }
       `}</style>
