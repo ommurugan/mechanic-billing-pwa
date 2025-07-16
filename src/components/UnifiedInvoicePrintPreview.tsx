@@ -79,21 +79,37 @@ const UnifiedInvoicePrintPreview = ({
 
       {/* Invoice content - this will be printed */}
       <div className="print-content max-w-4xl mx-auto p-4 print:p-2 print:max-w-none print:mx-0 bg-white">
-        {/* Company Header */}
-        <div className="text-center mb-3 border-b border-gray-300 pb-2">
-          <h1 className="text-2xl font-bold text-black">OM MURUGAN AUTO WORKS</h1>
-          <p className="text-sm text-gray-600 mb-1">Complete Auto Care Solutions</p>
+        {/* Company Header with Logo */}
+        <div className="text-center mb-3 border-b border-black pb-2">
+          {/* Logo Section */}
+          <div className="flex justify-center items-center mb-2">
+            <div className="w-16 h-16 border-2 border-black rounded-full flex items-center justify-center mr-3">
+              <div className="text-center">
+                <div className="text-xs font-bold">OM MURUGAN</div>
+                <div className="text-[8px]">AUTO WORKS</div>
+              </div>
+            </div>
+            <div className="text-left">
+              <h1 className="text-2xl font-bold text-black">OM MURUGAN AUTO WORKS</h1>
+              <p className="text-sm text-gray-600">Complete Auto Care Solutions</p>
+            </div>
+          </div>
+          
           <p className="text-xs text-gray-600 mb-1">
             Door No.8, 4th Main Road, Manikandapuram, Thirumullaivoyal,
           </p>
-          <p className="text-xs text-gray-600 mb-1">Chennai-600 062</p>
-          <div className="flex justify-center items-center gap-4 text-xs">
-            <span><strong>GSTIN/UIN:</strong> 33AXNPGZ468F1ZR</span>
-            <span><strong>State Name:</strong> Tamil Nadu, <strong>Code:</strong> 33</span>
-          </div>
-          <div className="flex justify-center items-center gap-4 text-xs mt-1">
-            <span><strong>E-Mail:</strong> gopalakrishn.p8@gmail.com</span>
-            <span><strong>Phone:</strong> + 91 9884551560</span>
+          <p className="text-xs text-gray-600 mb-2">Chennai-600 062</p>
+          
+          {/* Company details line */}
+          <div className="text-xs border-t border-black pt-1">
+            <div className="flex justify-center items-center gap-6 mb-1">
+              <span><strong>GSTIN/UIN:</strong> 33AXNPGZ468F1ZR</span>
+              <span><strong>State Name:</strong> Tamil Nadu, <strong>Code:</strong> 33</span>
+            </div>
+            <div className="flex justify-center items-center gap-6">
+              <span><strong>E-Mail:</strong> gopalakrishn.p8@gmail.com</span>
+              <span><strong>Phone:</strong> + 91 9884551560</span>
+            </div>
           </div>
         </div>
 
