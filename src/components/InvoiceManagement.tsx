@@ -51,10 +51,6 @@ const InvoiceManagement = () => {
     console.log("Print invoice:", invoice);
   };
 
-  const handleUndoPaid = (invoiceId: string) => {
-    console.log("Undo paid invoice:", invoiceId);
-  };
-
   return (
     <div className="container py-10">
       <Card>
@@ -95,7 +91,6 @@ const InvoiceManagement = () => {
               onDelete={handleDelete}
               onPrint={handlePrint}
               onMarkPaid={handleMarkPaid}
-              onUndoPaid={handleUndoPaid}
             />
 
             <InvoicePagination

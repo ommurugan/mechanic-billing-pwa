@@ -63,7 +63,6 @@ export type Database = {
           sgst_amount: number | null
           total_amount: number
           unit_price: number
-          unit_type: string | null
         }
         Insert: {
           cgst_amount?: number | null
@@ -80,7 +79,6 @@ export type Database = {
           sgst_amount?: number | null
           total_amount: number
           unit_price: number
-          unit_type?: string | null
         }
         Update: {
           cgst_amount?: number | null
@@ -97,7 +95,6 @@ export type Database = {
           sgst_amount?: number | null
           total_amount?: number
           unit_price?: number
-          unit_type?: string | null
         }
         Relationships: [
           {

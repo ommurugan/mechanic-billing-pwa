@@ -1,4 +1,3 @@
-
 import MobileInvoiceCard from "../MobileInvoiceCard";
 import { DatabaseInvoice } from "@/types/invoice";
 
@@ -12,7 +11,6 @@ interface InvoiceListProps {
   onDelete: (invoiceId: string) => void;
   onPrint: (invoice: DatabaseInvoice) => void;
   onMarkPaid: (invoiceId: string) => void;
-  onUndoPaid?: (invoiceId: string) => void;
 }
 
 export const InvoiceList = ({
@@ -25,7 +23,6 @@ export const InvoiceList = ({
   onDelete,
   onPrint,
   onMarkPaid,
-  onUndoPaid,
 }: InvoiceListProps) => {
   if (isLoading) {
     return <p className="text-center py-8">Loading invoices...</p>;
@@ -61,8 +58,7 @@ export const InvoiceList = ({
             onEdit={onEdit}
             onDelete={onDelete}
             onPrint={onPrint}
-            onMarkPaid={() => onMarkPaid(invoice.id)}
-            onUndoPaid={onUndoPaid ? () => onUndoPaid(invoice.id) : undefined}
+            onMarkPaid={onMarkPaid}
           />
         );
       })}

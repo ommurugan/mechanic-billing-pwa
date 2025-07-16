@@ -128,26 +128,6 @@ const GSTInvoiceManagement = () => {
     }
   };
 
-  const handleUndoPaid = async (invoiceId: string) => {
-    try {
-      const { error } = await supabase
-        .from('invoices')
-        .update({ 
-          status: 'pending',
-          paid_at: null
-        })
-        .eq('id', invoiceId);
-
-      if (error) throw error;
-
-      toast.success("Invoice reverted to pending!");
-      fetchData();
-    } catch (error) {
-      console.error('Error updating invoice:', error);
-      toast.error("Failed to update invoice status");
-    }
-  };
-
   const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = 
       invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -433,20 +413,8 @@ const GSTInvoiceManagement = () => {
                           variant="ghost" 
                           onClick={() => handleMarkAsPaid(invoice.id)}
                           className="text-green-600 hover:text-green-700"
-                          title="Mark as Paid"
                         >
                           <Check className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {invoice.status === 'paid' && (
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => handleUndoPaid(invoice.id)}
-                          className="text-orange-600 hover:text-orange-700"
-                          title="Undo Paid Status"
-                        >
-                          <Clock className="h-4 w-4" />
                         </Button>
                       )}
                       <Button size="sm" variant="ghost" onClick={() => handlePrintInvoice(invoice)}>
@@ -502,7 +470,6 @@ const GSTInvoiceManagement = () => {
                 onDelete={handleDeleteInvoice}
                 onPrint={handlePrintInvoice}
                 onMarkPaid={() => handleMarkAsPaid(invoice.id)}
-                onUndoPaid={() => handleUndoPaid(invoice.id)}
               />
             ))}
           </div>

@@ -23,48 +23,46 @@ const InvoiceItemsTable = ({ invoiceItems, invoice, loading }: InvoiceItemsTable
       <tbody>
         {/* Display invoice items */}
         {invoiceItems.map((item: any, index: number) => (
-          <tr key={index} className="border-0">
-            <td className="border-l border-r border-black p-2">
+          <tr key={index}>
+            <td className="border border-black p-2">
               {item.name}
               <div className="text-xs text-gray-600 capitalize">({item.item_type})</div>
             </td>
-            <td className="border-l border-r border-black p-2">{item.sac_hsn_code || '-'}</td>
-            <td className="border-l border-r border-black p-2 text-center">
-              {item.quantity} {item.unit_type || 'nos'}
-            </td>
-            <td className="border-l border-r border-black p-2 text-right">₹{item.unit_price.toFixed(2)}</td>
-            <td className="border-l border-r border-black p-2 text-right">₹{(item.discount_amount || 0).toFixed(2)}</td>
-            <td className="border-l border-r border-black p-2 text-right">₹{item.total_amount.toFixed(2)}</td>
+            <td className="border border-black p-2">{item.sac_hsn_code || '-'}</td>
+            <td className="border border-black p-2 text-center">{item.quantity}</td>
+            <td className="border border-black p-2 text-right">₹{item.unit_price.toFixed(2)}</td>
+            <td className="border border-black p-2 text-right">₹{(item.discount_amount || 0).toFixed(2)}</td>
+            <td className="border border-black p-2 text-right">₹{item.total_amount.toFixed(2)}</td>
           </tr>
         ))}
         
         {/* Labor charges if present */}
         {invoice.labor_charges > 0 && (
-          <tr className="border-0">
-            <td className="border-l border-r border-black p-2">
+          <tr>
+            <td className="border border-black p-2">
               Labor Charges
               <div className="text-xs text-gray-600">(Service)</div>
             </td>
-            <td className="border-l border-r border-black p-2">-</td>
-            <td className="border-l border-r border-black p-2 text-center">1 nos</td>
-            <td className="border-l border-r border-black p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
-            <td className="border-l border-r border-black p-2 text-right">₹0.00</td>
-            <td className="border-l border-r border-black p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
+            <td className="border border-black p-2">-</td>
+            <td className="border border-black p-2 text-center">1</td>
+            <td className="border border-black p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
+            <td className="border border-black p-2 text-right">₹0.00</td>
+            <td className="border border-black p-2 text-right">₹{invoice.labor_charges.toFixed(2)}</td>
           </tr>
         )}
         
         {/* Extra charges if present */}
         {invoice.extra_charges?.map((charge: any, index: number) => (
-          <tr key={`extra-${index}`} className="border-0">
-            <td className="border-l border-r border-black p-2">
+          <tr key={`extra-${index}`}>
+            <td className="border border-black p-2">
               {charge.name}
               <div className="text-xs text-gray-600">(Extra Charge)</div>
             </td>
-            <td className="border-l border-r border-black p-2">-</td>
-            <td className="border-l border-r border-black p-2 text-center">1 nos</td>
-            <td className="border-l border-r border-black p-2 text-right">₹{charge.amount.toFixed(2)}</td>
-            <td className="border-l border-r border-black p-2 text-right">₹0.00</td>
-            <td className="border-l border-r border-black p-2 text-right">₹{charge.amount.toFixed(2)}</td>
+            <td className="border border-black p-2">-</td>
+            <td className="border border-black p-2 text-center">1</td>
+            <td className="border border-black p-2 text-right">₹{charge.amount.toFixed(2)}</td>
+            <td className="border border-black p-2 text-right">₹0.00</td>
+            <td className="border border-black p-2 text-right">₹{charge.amount.toFixed(2)}</td>
           </tr>
         ))}
         
@@ -78,8 +76,8 @@ const InvoiceItemsTable = ({ invoiceItems, invoice, loading }: InvoiceItemsTable
         )}
         
         {!loading && invoiceItems.length === 0 && invoice.labor_charges === 0 && (!invoice.extra_charges || invoice.extra_charges.length === 0) && (
-          <tr className="border-t border-b border-black">
-            <td colSpan={6} className="border-l border-r border-black p-4 text-center text-gray-500">
+          <tr>
+            <td colSpan={6} className="border border-black p-4 text-center text-gray-500">
               No items found for this invoice
             </td>
           </tr>
