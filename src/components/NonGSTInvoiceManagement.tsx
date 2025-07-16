@@ -4,33 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { 
-  Plus, 
-  Search, 
-  Printer, 
-  Eye,
-  Edit,
-  Trash2,
-  Receipt,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  X,
-  Check
-} from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Plus, Search, Printer, Eye, Edit, Trash2, Receipt, Clock, CheckCircle, AlertCircle, X, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import NonGSTInvoiceForm from "./NonGSTInvoiceForm";
 import MobileInvoiceCard from "./MobileInvoiceCard";
 import UnifiedInvoicePrintPreview from "./UnifiedInvoicePrintPreview";
-
 const NonGSTInvoiceManagement = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
@@ -46,20 +26,12 @@ const NonGSTInvoiceManagement = () => {
   const [printInvoiceItems, setPrintInvoiceItems] = useState<any[]>([]);
   const [printLoading, setPrintLoading] = useState(false);
   const [showPaidNotification, setShowPaidNotification] = useState(false);
-
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [invoicesData, customersData, vehiclesData] = await Promise.all([
-        supabase
-          .from('invoices')
-          .select('*')
-          .eq('invoice_type', 'non-gst')
-          .order('created_at', { ascending: false }),
-        supabase.from('customers').select('*'),
-        supabase.from('vehicles').select('*')
-      ]);
-
+      const [invoicesData, customersData, vehiclesData] = await Promise.all([supabase.from('invoices').select('*').eq('invoice_type', 'non-gst').order('created_at', {
+        ascending: false
+      }), supabase.from('customers').select('*'), supabase.from('vehicles').select('*')]);
       if (invoicesData.data) setInvoices(invoicesData.data);
       if (customersData.data) setCustomers(customersData.data);
       if (vehiclesData.data) setVehicles(vehiclesData.data);
@@ -70,54 +42,57 @@ const NonGSTInvoiceManagement = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const getCustomerName = (customerId: string) => {
     return customers.find(c => c.id === customerId)?.name || "Unknown Customer";
   };
-
   const getVehicleInfo = (vehicleId: string) => {
     const vehicle = vehicles.find(v => v.id === vehicleId);
     return vehicle ? `${vehicle.make} ${vehicle.model}` : "Unknown Vehicle";
   };
-
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'paid': return 'default';
-      case 'pending': return 'secondary';
-      case 'overdue': return 'destructive';
-      case 'draft': return 'outline';
-      case 'cancelled': return 'outline';
-      default: return 'secondary';
+      case 'paid':
+        return 'default';
+      case 'pending':
+        return 'secondary';
+      case 'overdue':
+        return 'destructive';
+      case 'draft':
+        return 'outline';
+      case 'cancelled':
+        return 'outline';
+      default:
+        return 'secondary';
     }
   };
-
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'paid': return <CheckCircle className="h-4 w-4" />;
-      case 'pending': return <Clock className="h-4 w-4" />;
-      case 'overdue': return <AlertCircle className="h-4 w-4" />;
-      case 'draft': return <Edit className="h-4 w-4" />;
-      case 'cancelled': return <X className="h-4 w-4" />;
-      default: return <Receipt className="h-4 w-4" />;
+      case 'paid':
+        return <CheckCircle className="h-4 w-4" />;
+      case 'pending':
+        return <Clock className="h-4 w-4" />;
+      case 'overdue':
+        return <AlertCircle className="h-4 w-4" />;
+      case 'draft':
+        return <Edit className="h-4 w-4" />;
+      case 'cancelled':
+        return <X className="h-4 w-4" />;
+      default:
+        return <Receipt className="h-4 w-4" />;
     }
   };
-
   const handleMarkAsPaid = async (invoiceId: string) => {
     try {
-      const { error } = await supabase
-        .from('invoices')
-        .update({ 
-          status: 'paid',
-          paid_at: new Date().toISOString()
-        })
-        .eq('id', invoiceId);
-
+      const {
+        error
+      } = await supabase.from('invoices').update({
+        status: 'paid',
+        paid_at: new Date().toISOString()
+      }).eq('id', invoiceId);
       if (error) throw error;
-
       toast.success("Invoice marked as paid!");
       fetchData();
     } catch (error) {
@@ -125,19 +100,15 @@ const NonGSTInvoiceManagement = () => {
       toast.error("Failed to update invoice status");
     }
   };
-
   const handleUndoPaid = async (invoiceId: string) => {
     try {
-      const { error } = await supabase
-        .from('invoices')
-        .update({ 
-          status: 'pending',
-          paid_at: null
-        })
-        .eq('id', invoiceId);
-
+      const {
+        error
+      } = await supabase.from('invoices').update({
+        status: 'pending',
+        paid_at: null
+      }).eq('id', invoiceId);
       if (error) throw error;
-
       toast.success("Invoice reverted to pending!");
       fetchData();
     } catch (error) {
@@ -145,14 +116,9 @@ const NonGSTInvoiceManagement = () => {
       toast.error("Failed to update invoice status");
     }
   };
-
   const filteredInvoices = invoices.filter(invoice => {
-    const matchesSearch = 
-      invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      getCustomerName(invoice.customer_id).toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch = invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase()) || getCustomerName(invoice.customer_id).toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || invoice.status === statusFilter;
-    
     let matchesDate = true;
     if (dateFilter !== "all") {
       const invoiceDate = new Date(invoice.created_at);
@@ -171,30 +137,26 @@ const NonGSTInvoiceManagement = () => {
           break;
       }
     }
-    
     return matchesSearch && matchesStatus && matchesDate;
   });
-
   const handleSaveInvoice = (invoice: any) => {
     fetchData();
     setShowCreateForm(false);
     setSelectedInvoice(null);
   };
-
   const fetchInvoiceItems = async (invoiceId: string) => {
     try {
       setPrintLoading(true);
-      const { data: invoiceItems, error } = await supabase
-        .from('invoice_items')
-        .select('*')
-        .eq('invoice_id', invoiceId)
-        .order('created_at', { ascending: true });
-
+      const {
+        data: invoiceItems,
+        error
+      } = await supabase.from('invoice_items').select('*').eq('invoice_id', invoiceId).order('created_at', {
+        ascending: true
+      });
       if (error) {
         console.error('Error fetching invoice items:', error);
         return [];
       }
-
       return invoiceItems || [];
     } catch (error) {
       console.error('Error fetching invoice items:', error);
@@ -203,14 +165,12 @@ const NonGSTInvoiceManagement = () => {
       setPrintLoading(false);
     }
   };
-
   const handleViewInvoice = async (invoice: any) => {
     setPrintInvoice(invoice);
     const items = await fetchInvoiceItems(invoice.id);
     setPrintInvoiceItems(items);
     setShowPrintPreview(true);
   };
-
   const handleEditInvoice = (invoice: any) => {
     if (invoice.status === 'paid') {
       setShowPaidNotification(true);
@@ -219,16 +179,12 @@ const NonGSTInvoiceManagement = () => {
     setSelectedInvoice(invoice);
     setShowCreateForm(true);
   };
-
   const handleDeleteInvoice = async (invoiceId: string) => {
     try {
-      const { error } = await supabase
-        .from('invoices')
-        .delete()
-        .eq('id', invoiceId);
-
+      const {
+        error
+      } = await supabase.from('invoices').delete().eq('id', invoiceId);
       if (error) throw error;
-
       toast.success("Invoice deleted successfully!");
       fetchData();
     } catch (error) {
@@ -236,14 +192,12 @@ const NonGSTInvoiceManagement = () => {
       toast.error("Failed to delete invoice");
     }
   };
-
   const handlePrintInvoice = async (invoice: any) => {
     setPrintInvoice(invoice);
     const items = await fetchInvoiceItems(invoice.id);
     setPrintInvoiceItems(items);
     setShowPrintPreview(true);
   };
-
   const invoiceStats = {
     total: invoices.length,
     paid: invoices.filter(inv => inv.status === 'paid').length,
@@ -251,62 +205,41 @@ const NonGSTInvoiceManagement = () => {
     overdue: invoices.filter(inv => inv.status === 'overdue').length,
     totalRevenue: invoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + (inv.total || 0), 0)
   };
-
   if (showCreateForm) {
-    return (
-      <div className="space-y-4 md:space-y-6">
+    return <div className="space-y-4 md:space-y-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h2 className="text-xl md:text-2xl font-bold">
             {selectedInvoice ? 'Edit Non-GST Invoice' : 'Create New Non-GST Invoice'}
           </h2>
           <Button variant="outline" onClick={() => {
-            setShowCreateForm(false);
-            setSelectedInvoice(null);
-          }} className="w-full sm:w-auto">
+          setShowCreateForm(false);
+          setSelectedInvoice(null);
+        }} className="w-full sm:w-auto">
             Back to Non-GST Invoices
           </Button>
         </div>
         
-        <NonGSTInvoiceForm 
-          onSave={handleSaveInvoice}
-          onCancel={() => {
-            setShowCreateForm(false);
-            setSelectedInvoice(null);
-          }}
-          existingInvoice={selectedInvoice || undefined}
-        />
-      </div>
-    );
+        <NonGSTInvoiceForm onSave={handleSaveInvoice} onCancel={() => {
+        setShowCreateForm(false);
+        setSelectedInvoice(null);
+      }} existingInvoice={selectedInvoice || undefined} />
+      </div>;
   }
-
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
+    return <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+      </div>;
   }
 
   // Show print preview
   if (showPrintPreview && printInvoice) {
-    return (
-      <UnifiedInvoicePrintPreview
-        invoice={printInvoice}
-        customer={customers.find(c => c.id === printInvoice.customer_id)}
-        vehicle={vehicles.find(v => v.id === printInvoice.vehicle_id)}
-        invoiceItems={printInvoiceItems}
-        loading={printLoading}
-        onClose={() => {
-          setShowPrintPreview(false);
-          setPrintInvoice(null);
-          setPrintInvoiceItems([]);
-        }}
-      />
-    );
+    return <UnifiedInvoicePrintPreview invoice={printInvoice} customer={customers.find(c => c.id === printInvoice.customer_id)} vehicle={vehicles.find(v => v.id === printInvoice.vehicle_id)} invoiceItems={printInvoiceItems} loading={printLoading} onClose={() => {
+      setShowPrintPreview(false);
+      setPrintInvoice(null);
+      setPrintInvoiceItems([]);
+    }} />;
   }
-
-  return (
-    <div className="space-y-4 md:space-y-6">
+  return <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
@@ -370,12 +303,7 @@ const NonGSTInvoiceManagement = () => {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input 
-                  placeholder="Search by invoice number or customer..." 
-                  className="pl-10 h-12 md:h-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <Input placeholder="Search by invoice number or customer..." className="pl-10 h-12 md:h-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -416,20 +344,13 @@ const NonGSTInvoiceManagement = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredInvoices.length === 0 ? (
-              <div className="text-center py-8">
+            {filteredInvoices.length === 0 ? <div className="text-center py-8">
                 <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">No Non-GST invoices found</p>
-                <Button 
-                  onClick={() => setShowCreateForm(true)} 
-                  className="mt-4 bg-blue-600 hover:bg-blue-700"
-                >
+                <Button onClick={() => setShowCreateForm(true)} className="mt-4 bg-blue-600 hover:bg-blue-700">
                   Create First Non-GST Invoice
                 </Button>
-              </div>
-            ) : (
-              filteredInvoices.map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+              </div> : filteredInvoices.map(invoice => <div key={invoice.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                       {getStatusIcon(invoice.status)}
@@ -441,9 +362,7 @@ const NonGSTInvoiceManagement = () => {
                       </p>
                       <p className="text-xs text-gray-500">
                         Created: {new Date(invoice.created_at).toLocaleDateString()}
-                        {invoice.kilometers && (
-                          <span className="ml-2">• KM: {invoice.kilometers.toLocaleString()}</span>
-                        )}
+                        {invoice.kilometers && <span className="ml-2">• KM: {invoice.kilometers.toLocaleString()}</span>}
                       </p>
                     </div>
                   </div>
@@ -461,44 +380,19 @@ const NonGSTInvoiceManagement = () => {
                       <Button size="sm" variant="ghost" onClick={() => handleEditInvoice(invoice)}>
                         <Edit className="h-4 w-4" />
                       </Button>
-                      {invoice.status === 'pending' && (
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => handleMarkAsPaid(invoice.id)}
-                          className="text-green-600 hover:text-green-700"
-                          title="Mark as Paid"
-                        >
+                      {invoice.status === 'pending' && <Button size="sm" variant="ghost" onClick={() => handleMarkAsPaid(invoice.id)} className="text-green-600 hover:text-green-700" title="Mark as Paid">
                           <Check className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {invoice.status === 'paid' && (
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => handleUndoPaid(invoice.id)}
-                          className="text-orange-600 hover:text-orange-700"
-                          title="Undo Paid Status"
-                        >
+                        </Button>}
+                      {invoice.status === 'paid' && <Button size="sm" variant="ghost" onClick={() => handleUndoPaid(invoice.id)} className="text-orange-600 hover:text-orange-700" title="Undo Paid Status">
                           <Clock className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button size="sm" variant="ghost" onClick={() => handlePrintInvoice(invoice)}>
-                        <Printer className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => handleDeleteInvoice(invoice.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
+                        </Button>}
+                      
+                      <Button size="sm" variant="ghost" onClick={() => handleDeleteInvoice(invoice.id)} className="text-red-500 hover:text-red-700">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
+                </div>)}
           </div>
         </CardContent>
       </Card>
@@ -509,39 +403,19 @@ const NonGSTInvoiceManagement = () => {
           <h3 className="font-semibold">Non-GST Invoices ({filteredInvoices.length})</h3>
         </div>
         
-        {filteredInvoices.length === 0 ? (
-          <Card>
+        {filteredInvoices.length === 0 ? <Card>
             <CardContent className="pt-8 pb-8">
               <div className="text-center">
                 <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 mb-4">No Non-GST invoices found</p>
-                <Button 
-                  onClick={() => setShowCreateForm(true)} 
-                  className="bg-blue-600 hover:bg-blue-700 w-full"
-                >
+                <Button onClick={() => setShowCreateForm(true)} className="bg-blue-600 hover:bg-blue-700 w-full">
                   Create First Non-GST Invoice
                 </Button>
               </div>
             </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {filteredInvoices.map((invoice) => (
-              <MobileInvoiceCard
-                key={invoice.id}
-                invoice={invoice}
-                customerName={getCustomerName(invoice.customer_id)}
-                vehicleInfo={getVehicleInfo(invoice.vehicle_id)}
-                onEdit={handleEditInvoice}
-                onDelete={handleDeleteInvoice}
-                onPrint={handlePrintInvoice}
-                onMarkPaid={() => handleMarkAsPaid(invoice.id)}
-                onUndoPaid={() => handleUndoPaid(invoice.id)}
-                onView={handleViewInvoice}
-              />
-            ))}
-          </div>
-        )}
+          </Card> : <div className="space-y-3">
+            {filteredInvoices.map(invoice => <MobileInvoiceCard key={invoice.id} invoice={invoice} customerName={getCustomerName(invoice.customer_id)} vehicleInfo={getVehicleInfo(invoice.vehicle_id)} onEdit={handleEditInvoice} onDelete={handleDeleteInvoice} onPrint={handlePrintInvoice} onMarkPaid={() => handleMarkAsPaid(invoice.id)} onUndoPaid={() => handleUndoPaid(invoice.id)} onView={handleViewInvoice} />)}
+          </div>}
       </div>
 
       {/* Paid Invoice Notification Dialog */}
@@ -563,8 +437,6 @@ const NonGSTInvoiceManagement = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+    </div>;
 };
-
 export default NonGSTInvoiceManagement;
